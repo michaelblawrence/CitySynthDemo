@@ -1,11 +1,14 @@
 {
-  "name": "resume",
+  "name": "niflum-io",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "konva": "^4.0.5",
     "react": "^16.6.0",
     "react-dom": "^16.6.0",
-    "react-scripts": "2.1.1"
+    "react-konva": "^16.9.0-0",
+    "react-scripts": "2.1.1",
+    "use-image": "^1.0.4"
   },
   "scripts": {
     "start": "react-scripts start",

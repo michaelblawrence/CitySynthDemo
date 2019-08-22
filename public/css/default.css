@@ -596,6 +596,7 @@ input[type="checkbox"] { display: inline; }
    width: 96%;
    max-width: 1020px;
    margin: 0 auto;
+   min-width: 925px;
 }
 /* fixed width for IE8 */
 .ie .row { width: 1000px ; }
