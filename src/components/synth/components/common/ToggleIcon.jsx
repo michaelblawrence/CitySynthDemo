@@ -62,22 +62,24 @@ export class ToggleIcon extends Component {
         img_x: this.w / 2 - imgInfo.w / 2,
         img_y: this.h - imgInfo.h,
         txt_x: 0,
-        txt_y: this.h - 15 - imgInfo.h,
+        txt_y: this.h - 12 - imgInfo.h,
         layoutCompleted: true,
       });
     });
   }
 
   handleClick = () => {
-    this.setState((state) => {
-      return ({
-        checked: !state.checked
+    if (this.props.enabled) {
+      this.setState((state) => {
+        return ({
+          checked: !state.checked
+        });
       });
-    });
+  }
   }
 
   render() {
-    const { x, y } = this.props;
+    const { x, y, w } = this.props;
     return (
       <Group x={x} y={y}>
         {/* <Rect width={this.w} height={this.h} fill="black"/> */}
@@ -90,8 +92,9 @@ export class ToggleIcon extends Component {
         {this.state.text ? <HeaderText
           x={this.state.txt_x}
           y={this.state.txt_y}
+          width={w}
           centered={true}
-          fillColour={{ r: 255, g: 255, b: 255, a: 128 }}
+          fillColour={{ r: 255, g: 255, b: 255, a: 150 }}
         >{this.state.text}</HeaderText> : null}
       </Group>
     );
@@ -101,9 +104,15 @@ export class ToggleIcon extends Component {
 ToggleIcon.propTypes = {
   w: PropTypes.number,
   h: PropTypes.number,
+  x: PropTypes.number,
+  y: PropTypes.number,
+  enabled: PropTypes.bool,
 };
 
 ToggleIcon.defaultProps = {
   w: 44,
-  h: 53
+  h: 53,
+  x: 0,
+  y: 0,
+  enabled: true,
 };

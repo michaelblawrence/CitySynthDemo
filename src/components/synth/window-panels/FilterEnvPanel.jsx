@@ -6,7 +6,7 @@ class EnvPanel extends Component {
   render() {
     return (
       <Group>
-        <HeaderText x={460} y={97}>ENVELOPE</HeaderText>
+        <HeaderText x={460} y={97} width={62}>ENVELOPE</HeaderText>
         <ToggleIcon x={619} y={90} w={28} h={24} />
 
         <Dial x={471} y={123} h={70}>Attack</Dial>

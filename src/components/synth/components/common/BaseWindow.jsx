@@ -15,7 +15,9 @@ export class BaseWindow extends Component {
         <Layer>
           <Group>
             <BackgroundImage />
-            {this.props.children}
+            <Group y={3}>
+              {this.props.children}
+            </Group>
           </Group>
         </Layer>
       </Stage>

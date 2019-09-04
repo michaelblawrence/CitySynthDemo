@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import { BaseWindow, HeaderText, ToggleIcon, Dial } from './synth';
-import { OscGroupPanel, EnvGroupPanel, MasterGroupPanel } from './synth/window-panels';
+import { BaseWindow, ToggleIcon } from './synth';
+import { OscGroupPanel, EnvGroupPanel, MasterGroupPanel, PitchGroupPanel, AmpEnvGroupPanel, FilterTouchGroupPanel } from './synth/window-panels';
 
 export class SynthWindow extends Component {
   render() {
@@ -13,7 +13,9 @@ export class SynthWindow extends Component {
             <EnvGroupPanel />
             <MasterGroupPanel />
 
-            {/* // more panels // */}
+            <PitchGroupPanel />
+            <AmpEnvGroupPanel />
+            <FilterTouchGroupPanel />
           </BaseWindow>
         </div>
       </section>
@@ -22,5 +24,5 @@ export class SynthWindow extends Component {
 }
 
 function CloseWindowButton() {
-  return <ToggleIcon x={8} y={6} w={20} h={19} />;
+  return <ToggleIcon x={8} y={4} w={20} h={19} />;
 }

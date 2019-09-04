@@ -1,12 +1,13 @@
 import React, { Component } from 'react';
 import { Group } from 'react-konva';
-import { HeaderText, Dial } from '../components';
+import { HeaderText, Dial, PanelDivider, WavePreviewBox } from '../components';
 
 class OscPanel extends Component {
   render() {
     return (
       <Group>
         <HeaderText x={131} y={97} width={38} centered>OSC 1</HeaderText>
+        <WavePreviewBox x={131} y={120} />
 
         <Dial x={127} y={186} h={83}>Wave Selector</Dial>
         <Dial x={193} y={200} h={69}>Phase</Dial>
@@ -34,6 +35,7 @@ export class OscGroupPanel extends Component {
     return (
       <Group>
         <OscPanel />
+        <PanelDivider x={331} y={110}/>
         <DelayPanel />
       </Group>
     );

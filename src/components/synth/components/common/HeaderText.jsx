@@ -1,13 +1,12 @@
 // @ts-check
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Text } from 'react-konva';
+import { Text, Group, Rect } from 'react-konva';
 import { rgbaToHexCode } from '../../../../common';
 
 export class HeaderText extends Component {
   state = {
     text: 'HeaderLabel',
-    fillColour: { r: 238, g: 129, b: 12 },
   };
 
   /**
@@ -23,29 +22,31 @@ export class HeaderText extends Component {
    */
   constructor(props) {
     super(props);
-    const { text, fillColour, children } = props;
+    const { text, children } = props;
     this.state = {
       text: text || (typeof children === 'string' && children) || this.state.text,
-      fillColour: fillColour || this.state.fillColour,
     };
     this.state.text = this.state.text.toUpperCase();
   }
 
   render() {
-    const { r, g, b, a } = this.state.fillColour;
+    const { r, g, b, a } = this.props.fillColour;
     const color = rgbaToHexCode(r, g, b, a);
     return (
-      <Text
-        text={this.state.text}
+      <Group
         x={this.props.x}
-        y={this.props.y}
-        fontFamily={'Roboto Condensed, Roboto, Arial'}
-        fontSize={13}
-        fontStyle={'bold'}
-        align={this.props.centered ? 'center' : undefined}
-        fill={color}
-        width={this.props.width}
-      />
+        y={this.props.y} >
+        {/* <Rect width={this.props.width} height={20} fill="red" /> */}
+        <Text
+          text={this.state.text}
+          fontFamily={'Roboto Condensed, Roboto, Arial'}
+          fontSize={13}
+          fontStyle={'bold'}
+          align={this.props.centered ? 'center' : undefined}
+          fill={color}
+          width={this.props.width}
+        />
+      </Group>
     );
   }
 }
@@ -63,4 +64,6 @@ HeaderText.propTypes = {
   })
 }
 
-
+HeaderText.defaultProps = {
+  fillColour: { r: 238, g: 129, b: 12 },
+}

@@ -18,13 +18,21 @@ export function AssetImage(props) {
   const dir = (typeof resDirector === 'string' && resDirector) || 'synth';
 
   const [image] = getImage(dir, componentScope, assetName, ext);
+  const imageRef = React.useRef();
+
+  /** @type {Image} */
+  const imgNode = imageRef.current;
+
+  if (imgNode) {
+    // imgNode.rotation(this.imgContainer.rotation() + 90);
+  }
 
   if (image) {
     const imgInfo = getImageInfo(image);
     typeof (onInfoReady) === 'function' && onInfoReady(imgInfo);
   }
 
-  return <Image image={image} {...others} />;
+  return <Image image={image} ref={imageRef} {...others} />;
 };
 
 /**

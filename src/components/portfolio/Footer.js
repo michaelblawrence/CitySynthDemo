@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-export default class Footer extends Component {
+export class Footer extends Component {
   render() {
     let resumeData = this.props.resumeData;
     return (
