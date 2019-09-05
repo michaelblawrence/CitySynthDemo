@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { BaseWindow, ToggleIcon } from './synth';
-import { OscGroupPanel, EnvGroupPanel, MasterGroupPanel, PitchGroupPanel, AmpEnvGroupPanel, FilterTouchGroupPanel } from './synth/window-panels';
+import { OscGroupPanel, EnvGroupPanel, MasterGroupPanel, PitchGroupPanel, FilterTouchGroupPanel, AmpEnvGroupPanel } from './synth/window-panels';
 
 export class SynthWindow extends Component {
   render() {

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Group, Ellipse, Rect } from 'react-konva';
+import { Group, Ellipse } from 'react-konva';
 import { AssetImage } from '../features';
 import { HeaderText } from './HeaderText';
 import { rgbaToHexCode, clampNumber } from '../../../../common';
@@ -26,11 +26,8 @@ const DialMarkerImage = (props) => {
     y: 20,
   }
   return (
-    // <Group>
-    // <Group x={x - offset.x} y={y - offset.y}>
     <AssetImage componentScope={'Dial'} assetName={'dial-fg-marker'} {...other}
       x={x + offset.x} y={y + offset.y} offsetX={offset.x} offsetY={offset.y} />
-    // </Group>
   )
 };
 DialMarkerImage.imgWidthPx = 39;
@@ -64,8 +61,6 @@ export class Dial extends Component {
   state = {
     text: 'Param',
     value: 0,
-    // rotation: 0,
-    // handle: null,
     inactive: true,
     mouseDown: false,
   };
@@ -83,7 +78,6 @@ export class Dial extends Component {
       ? text
       : (typeof children === 'string' && children) || this.state.text;
 
-    // this.state.handle = setInterval(() => this.setState(state => ({rotation: state.rotation + 15})), 200);
     this.offsetY = 0;
 
     this.handleDragStart = this.handleDragStart.bind(this);
@@ -103,17 +97,18 @@ export class Dial extends Component {
     if (!this.state.mouseDown) {
       return;
     }
-    // console.log({evt, ...others});
-    // console.log({target: others.target._id, currentTarget: others.currentTarget._id});
 
     let offsetY = evt.offsetY;
 
     let dy = this.offsetY - offsetY;
 
     this.setState(state => {
-      const nextValue = state.value + 0.01 * dy;
-      this.props.valueChanged && this.props.valueChanged(nextValue);
-      // console.log('new value ' + nextValue);
+      const nextValue = Math.round(state.value * 1000 + dy * 10) * 0.001;
+      this.props.valueChanged
+        && state.value !== nextValue
+        && nextValue >= 0
+        && nextValue <= 1
+        && this.props.valueChanged(nextValue);
       return {
         value: clampNumber(nextValue),
       }
@@ -126,13 +121,9 @@ export class Dial extends Component {
   /**
    * @param {{evt: DragEvent}} evt 
    */
-  handleDragStart({evt}) {
+  handleDragStart({ evt }) {
     this.offsetY = evt.offsetY;
     this.setState({ mouseDown: true, inactive: false });
-      // if (this.state.handle !== null) {
-    //   clearInterval(this.state.handle);
-    //   this.setState({handle: null});
-    // }
   }
 
   render() {
@@ -178,3 +169,10 @@ Dial.propTypes = {
 Dial.defaultProps = {
   value: 0
 }
+
+export const ReduxDial = ({store, action, ...others}) => {
+  const handleValueChanged = (value) => store.dispatch(action(value))
+  return <Dial {...others} valueChanged={handleValueChanged} />
+}
+
+export default Dial;
