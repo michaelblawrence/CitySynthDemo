@@ -171,7 +171,7 @@ Dial.defaultProps = {
 }
 
 export const ReduxDial = ({store, action, ...others}) => {
-  const handleValueChanged = (value) => store.dispatch(action(value))
+  const handleValueChanged = (value) => store.dispatch(action(value));
   return <Dial {...others} valueChanged={handleValueChanged} />
 }
 

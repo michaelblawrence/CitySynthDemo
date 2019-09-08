@@ -29,7 +29,7 @@ export class ToggleIcon extends Component {
   };
 
   /**
-   * @param {{w: number, h: number, text?: string, children: React.ReactNode}} props
+   * @param {{w: number, h: number, text?: string, onClick: (checked: boolean) => void, children: React.ReactNode}} props
    */
   constructor(props) {
     super(props);
@@ -70,6 +70,7 @@ export class ToggleIcon extends Component {
 
   handleClick = () => {
     if (this.props.enabled) {
+      this.props.onClick && this.props.onClick(!this.state.checked);
       this.setState((state) => {
         return ({
           checked: !state.checked

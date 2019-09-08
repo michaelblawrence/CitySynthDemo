@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { BaseWindow, ToggleIcon } from './synth';
 import { OscGroupPanel, EnvGroupPanel, MasterGroupPanel, PitchGroupPanel, FilterTouchGroupPanel, AmpEnvGroupPanel } from './synth/window-panels';
+import { getWasmModule } from '../store';
 
 export class SynthWindow extends Component {
   render() {
@@ -24,5 +25,8 @@ export class SynthWindow extends Component {
 }
 
 function CloseWindowButton() {
-  return <ToggleIcon x={8} y={4} w={20} h={19} />;
+  const handleClick = (checked) => {
+    getWasmModule();
+  };
+  return <ToggleIcon x={8} y={4} w={20} h={19} onClick={handleClick} />;
 }
