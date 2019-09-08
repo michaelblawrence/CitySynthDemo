@@ -1,0 +1,15 @@
+{
+  "name": "citysynth-wasm",
+  "collaborators": [
+    "Michael Lawrence <mblawrence27@gmail.com>"
+  ],
+  "version": "0.1.0",
+  "files": [
+    "citysynth_wasm_bg.wasm",
+    "citysynth_wasm.js",
+    "citysynth_wasm.d.ts"
+  ],
+  "module": "citysynth_wasm.js",
+  "types": "citysynth_wasm.d.ts",
+  "sideEffects": "false"
+}
