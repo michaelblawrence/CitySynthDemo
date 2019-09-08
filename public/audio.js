@@ -33,8 +33,6 @@ class CityRustGenerator extends AudioWorkletProcessor {
 
 registerProcessor('city-rust', CityRustGenerator);
 
-// addEventListener('message', handleMessage.bind(this));
-
 async function handleMessage(msg) {
     const { data: { type, data } } = msg;
     if (!type) {
@@ -50,6 +48,9 @@ async function handleMessage(msg) {
             return;
         case 'KEY_UP':
             handleKeyUp(data);
+            return;
+        case 'SET_PRESET':
+            loadPreset(data);
             return;
         case 'SET_PARAM':
             setParam(data);
@@ -81,6 +82,19 @@ function handleKeyUp(data) {
     }
 }
 
+function loadPreset(data) {
+    /**
+     * @type CitySynth
+     */
+    const synth = globalThis.synth;
+    if (synth && typeof data === 'string') {
+        console.warn('changing from current preset.. ' + synth.print('preset name: '));
+        console.log(`synth.load_preset(line = ${data});`);
+        synth.load_preset(data);
+    }
+}
+
+
 function setParam(data) {
     const { param, value } = data;
     const paramIden = Param[param];
@@ -105,7 +119,7 @@ function getParam(data, port) {
     const synth = globalThis.synth;
     if (synth && paramIden) {
         const value = synth.get_state(paramIden, -1);
-        port.postMessage({param, paramIden, value});
+        port.postMessage({ param, paramIden, value });
         return value;
     }
 }
@@ -134,10 +148,144 @@ async function initModule(module) {
 
 
 
+// ---------------------- polyfills -----------------------------------
+
+if (typeof TextEncoder === "undefined") {
+    globalThis.TextEncoder = function TextEncoder() { };
+    TextEncoder.prototype.encode = function encode(str) {
+        "use strict";
+        var Len = str.length, resPos = -1;
+        // The Uint8Array's length must be at least 3x the length of the string because an invalid UTF-16
+        //  takes up the equivelent space of 3 UTF-8 characters to encode it properly. However, Array's
+        //  have an auto expanding length and 1.5x should be just the right balance for most uses.
+        var resArr = typeof Uint8Array === "undefined" ? new Array(Len * 1.5) : new Uint8Array(Len * 3);
+        for (var point = 0, nextcode = 0, i = 0; i !== Len;) {
+            point = str.charCodeAt(i), i += 1;
+            if (point >= 0xD800 && point <= 0xDBFF) {
+                if (i === Len) {
+                    resArr[resPos += 1] = 0xef/*0b11101111*/; resArr[resPos += 1] = 0xbf/*0b10111111*/;
+                    resArr[resPos += 1] = 0xbd/*0b10111101*/; break;
+                }
+                // https://mathiasbynens.be/notes/javascript-encoding#surrogate-formulae
+                nextcode = str.charCodeAt(i);
+                if (nextcode >= 0xDC00 && nextcode <= 0xDFFF) {
+                    point = (point - 0xD800) * 0x400 + nextcode - 0xDC00 + 0x10000;
+                    i += 1;
+                    if (point > 0xffff) {
+                        resArr[resPos += 1] = (0x1e/*0b11110*/ << 3) | (point >>> 18);
+                        resArr[resPos += 1] = (0x2/*0b10*/ << 6) | ((point >>> 12) & 0x3f/*0b00111111*/);
+                        resArr[resPos += 1] = (0x2/*0b10*/ << 6) | ((point >>> 6) & 0x3f/*0b00111111*/);
+                        resArr[resPos += 1] = (0x2/*0b10*/ << 6) | (point & 0x3f/*0b00111111*/);
+                        continue;
+                    }
+                } else {
+                    resArr[resPos += 1] = 0xef/*0b11101111*/; resArr[resPos += 1] = 0xbf/*0b10111111*/;
+                    resArr[resPos += 1] = 0xbd/*0b10111101*/; continue;
+                }
+            }
+            if (point <= 0x007f) {
+                resArr[resPos += 1] = (0x0/*0b0*/ << 7) | point;
+            } else if (point <= 0x07ff) {
+                resArr[resPos += 1] = (0x6/*0b110*/ << 5) | (point >>> 6);
+                resArr[resPos += 1] = (0x2/*0b10*/ << 6) | (point & 0x3f/*0b00111111*/);
+            } else {
+                resArr[resPos += 1] = (0xe/*0b1110*/ << 4) | (point >>> 12);
+                resArr[resPos += 1] = (0x2/*0b10*/ << 6) | ((point >>> 6) & 0x3f/*0b00111111*/);
+                resArr[resPos += 1] = (0x2/*0b10*/ << 6) | (point & 0x3f/*0b00111111*/);
+            }
+        }
+        if (typeof Uint8Array !== "undefined") return resArr.subarray(0, resPos + 1);
+        // else // IE 6-9
+        resArr.length = resPos + 1; // trim off extra weight
+        return resArr;
+    };
+    TextEncoder.prototype.toString = function () { return "[object TextEncoder]" };
+    try { // Object.defineProperty only works on DOM prototypes in IE8
+        Object.defineProperty(TextEncoder.prototype, "encoding", {
+            get: function () {
+                if (TextEncoder.prototype.isPrototypeOf(this)) return "utf-8";
+                else throw TypeError("Illegal invocation");
+            }
+        });
+    } catch (e) { /*IE6-8 fallback*/ TextEncoder.prototype.encoding = "utf-8"; }
+    if (typeof Symbol !== "undefined") TextEncoder.prototype[Symbol.toStringTag] = "TextEncoder";
+}
+
+/**
+ * @constructor
+ * @param {string=} utfLabel
+ * @param {{fatal: boolean}=} options
+ */
+function TextDecoder(utfLabel = 'utf-8', options = { fatal: false }) {
+    if (utfLabel !== 'utf-8') {
+        throw new RangeError(
+            `Failed to construct 'TextDecoder': The encoding label provided ('${utfLabel}') is invalid.`);
+    }
+    if (options.fatal) {
+        throw new Error(`Failed to construct 'TextDecoder': the 'fatal' option is unsupported.`);
+    }
+}
+
+Object.defineProperty(TextDecoder.prototype, 'encoding', { value: 'utf-8' });
+
+Object.defineProperty(TextDecoder.prototype, 'fatal', { value: false });
+
+Object.defineProperty(TextDecoder.prototype, 'ignoreBOM', { value: false });
+
+/**
+ * @param {(!ArrayBuffer|!ArrayBufferView)} buffer
+ * @param {{stream: boolean}=} options
+ */
+TextDecoder.prototype.decode = function (buffer, options = { stream: false }) {
+    if (options['stream']) {
+        throw new Error(`Failed to decode: the 'stream' option is unsupported.`);
+    }
+
+    const bytes = new Uint8Array(buffer);
+    let pos = 0;
+    const len = bytes.length;
+    const out = [];
+
+    while (pos < len) {
+        const byte1 = bytes[pos++];
+        if (byte1 === 0) {
+            break;  // NULL
+        }
+
+        if ((byte1 & 0x80) === 0) {  // 1-byte
+            out.push(byte1);
+        } else if ((byte1 & 0xe0) === 0xc0) {  // 2-byte
+            const byte2 = bytes[pos++] & 0x3f;
+            out.push(((byte1 & 0x1f) << 6) | byte2);
+        } else if ((byte1 & 0xf0) === 0xe0) {
+            const byte2 = bytes[pos++] & 0x3f;
+            const byte3 = bytes[pos++] & 0x3f;
+            out.push(((byte1 & 0x1f) << 12) | (byte2 << 6) | byte3);
+        } else if ((byte1 & 0xf8) === 0xf0) {
+            const byte2 = bytes[pos++] & 0x3f;
+            const byte3 = bytes[pos++] & 0x3f;
+            const byte4 = bytes[pos++] & 0x3f;
+
+            // this can be > 0xffff, so possibly generate surrogates
+            let codepoint = ((byte1 & 0x07) << 0x12) | (byte2 << 0x0c) | (byte3 << 0x06) | byte4;
+            if (codepoint > 0xffff) {
+                // codepoint &= ~0x10000;
+                codepoint -= 0x10000;
+                out.push((codepoint >>> 10) & 0x3ff | 0xd800)
+                codepoint = 0xdc00 | codepoint & 0x3ff;
+            }
+            out.push(codepoint);
+        } else {
+            // FIXME: we're ignoring this
+        }
+    }
+
+    return String.fromCharCode.apply(null, out);
+}
 
 
 
-
+// ---------------------------------------- wasm-bg -------------------------------------
 
 function isLikeNone(x) {
     return x === undefined || x === null;
@@ -160,7 +308,7 @@ function passArrayF32ToWasm(arg) {
     return ptr;
 }
 
-let cachedTextEncoder = {}; //new TextEncoder('utf-8');
+let cachedTextEncoder = new TextEncoder('utf-8');
 
 let cachegetUint8Memory = null;
 function getUint8Memory() {
@@ -171,7 +319,6 @@ function getUint8Memory() {
 }
 
 function passStringToWasm(arg) {
-
     const buf = cachedTextEncoder.encode(arg);
     const ptr = wasm.__wbindgen_malloc(buf.length);
     getUint8Memory().set(buf, ptr);
@@ -179,7 +326,7 @@ function passStringToWasm(arg) {
     return ptr;
 }
 
-let cachedTextDecoder = {}; //new TextDecoder('utf-8');
+let cachedTextDecoder = new TextDecoder('utf-8');
 
 function getStringFromWasm(ptr, len) {
     return cachedTextDecoder.decode(getUint8Memory().subarray(ptr, ptr + len));
@@ -203,87 +350,6 @@ function getUint32Memory() {
 /**
 */
 /* export */ const Param = Object.freeze({ Attack: 0, AmpLFOrate: 1, AmpLFOwidth: 2, Decay: 3, DelayWet: 4, Gain: 5, Harmonic2Gain: 6, HarmonicsControl: 7, HarmonicFix: 8, HarmonicFunction: 9, HarmonicPhase: 10, HarmonicV1: 11, HPFCutoff: 12, LPF: 13, LPFattack: 14, LPFceiling: 15, LPFenvelope: 16, LPFfloor: 17, LPFmodrate: 18, LPFrelease: 19, LPFwidth: 20, Pitchmod: 21, PitchmodWidth: 22, Release: 23, ReverbWet: 24, SubOscGain: 25, Sustain: 26, WFunction: 27, });
-
-function freeUniverse(ptr) {
-
-    wasm.__wbg_universe_free(ptr);
-}
-/**
-*/
-/* export */ class Universe {
-
-    static __wrap(ptr) {
-        const obj = Object.create(Universe.prototype);
-        obj.ptr = ptr;
-
-        return obj;
-    }
-
-    free() {
-        const ptr = this.ptr;
-        this.ptr = 0;
-        freeUniverse(ptr);
-    }
-
-    /**
-    * @returns {Universe}
-    */
-    static new() {
-        return Universe.__wrap(wasm.universe_new());
-    }
-    /**
-    * @returns {number}
-    */
-    width() {
-        return wasm.universe_width(this.ptr);
-    }
-    /**
-    * @returns {number}
-    */
-    height() {
-        return wasm.universe_height(this.ptr);
-    }
-    /**
-    * @param {number} arg0
-    * @param {number} arg1
-    * @returns {void}
-    */
-    set_size(arg0, arg1) {
-        return wasm.universe_set_size(this.ptr, arg0, arg1);
-    }
-    /**
-    * @returns {number}
-    */
-    cells() {
-        return wasm.universe_cells(this.ptr);
-    }
-    /**
-    * @returns {void}
-    */
-    reset() {
-        return wasm.universe_reset(this.ptr);
-    }
-    /**
-    * @returns {void}
-    */
-    clear() {
-        return wasm.universe_clear(this.ptr);
-    }
-    /**
-    * @param {number} arg0
-    * @param {number} arg1
-    * @returns {void}
-    */
-    toggle(arg0, arg1) {
-        return wasm.universe_toggle(this.ptr, arg0, arg1);
-    }
-    /**
-    * @returns {void}
-    */
-    tick() {
-        return wasm.universe_tick(this.ptr);
-    }
-}
 
 function freeCitySynth(ptr) {
 
