@@ -56,7 +56,7 @@ async function handleMessage(msg) {
             setParam(data);
             return;
         case 'GET_PARAM':
-            setParam(data, this.port);
+            getParam(data, this.port);
             return;
     }
     console.error('got message with unknown type');
@@ -117,9 +117,9 @@ function getParam(data, port) {
      * @type CitySynth
      */
     const synth = globalThis.synth;
-    if (synth && paramIden) {
-        const value = synth.get_state(paramIden, -1);
-        port.postMessage({ param, paramIden, value });
+    if (synth && typeof paramIden !== 'undefined') {
+        const value = synth.get_state(paramIden);
+        port.postMessage({ type: 'PARAM_CALLBACK', param, paramIden, value });
         return value;
     }
 }

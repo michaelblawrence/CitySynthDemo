@@ -7,6 +7,7 @@ import { Param, InversedParam } from './redux/types';
 const WorkerActions = {
     MODULE: 'MODULE',
     SET_PRESET: 'SET_PRESET',
+    GET_PARAM: 'GET_PARAM',
     SET_PARAM: 'SET_PARAM',
     KEY_DOWN: 'KEY_DOWN',
     KEY_UP: 'KEY_UP',
@@ -15,6 +16,7 @@ const WorkerActionFactory = {
     sendModule: (module) => ({ type: WorkerActions.MODULE, data: module }),
     sendKeyDown: (keyCode) => ({ type: WorkerActions.KEY_DOWN, data: keyCode }),
     sendKeyUp: (keyCode) => ({ type: WorkerActions.KEY_UP, data: keyCode }),
+    getState: (paramIden) => ({ type: WorkerActions.GET_PARAM, data: paramIden }),
     setState: (paramData) => ({ type: WorkerActions.SET_PARAM, data: paramData }),
     setPreset: (presetLine) => ({ type: WorkerActions.SET_PRESET, data: presetLine }),
 }
@@ -34,12 +36,13 @@ export async function getWasmModule() {
 }
 
 const presetPromptChar = '.';
+const getParamChar = ',';
 
 window.addEventListener('keydown', (evt) => {
     // evt.preventDefault();
     const { synthNode } = initState;
     if (synthNode && !evt.repeat) {
-        if (evt.key === presetPromptChar) {
+        if (evt.key === presetPromptChar || evt.key === getParamChar) {
             return;
         }
         console.warn('keydown ' + evt.keyCode);
@@ -57,15 +60,45 @@ window.addEventListener('keyup', (evt) => {
             synthNode.port.postMessage(WorkerActionFactory.setPreset(presetLine));
             return;
         }
+        if (evt.key === getParamChar) {
+            getParamValue(0).then(console.log);
+            return;
+        }
         console.warn('keyup ' + evt.keyCode);
         synthNode.port.postMessage(WorkerActionFactory.sendKeyUp(evt.keyCode));
     }
 })
 
+async function getParamValue(paramIden) {
+    return await new Promise((resolve, reject) => {
+        try {
+            /**
+             * @type {{synthNode: AudioWorkletNode}}
+             */
+            const { synthNode } = initState;
+            if (synthNode && typeof paramIden !== 'undefined') {
+                /**
+                 * @param {MessageEvent} evt
+                 */
+                synthNode.port.onmessage = evt => {
+                    const { data } = evt;
+                    if (typeof data !== 'undefined' && data.type === 'PARAM_CALLBACK' && data.paramIden === paramIden) {
+                        synthNode.port.onmessage = null;
+                        resolve(data.value);
+                    }
+                }
+                synthNode.port.postMessage(WorkerActionFactory.getState({ param: InversedParam[paramIden] }));
+            }
+        } catch (ex) {
+            reject(ex);
+        }
+    });
+}
+
 export const store = configureStore({ reducer: rootReducer });
 
 store.subscribe(() => {
-    const {meta, ...state} = store.getState();
+    const { meta, ...state } = store.getState();
     const { synthNode } = initState;
 
     Object.keys(state).map(stateKey => {
