@@ -11,8 +11,16 @@ export function rootReducer(state, action) {
     const reducers = [
         AmpEnvReducer,
         OscReducer,
+        MetaReducer,
     ];
     return reducers.reduce((state, reducer) => reducer(action, state), state);
+}
+
+function MetaReducer(action, state) {
+    switch (action.type) {
+        case types.SET_ALL_PARAMS:
+            return {...state, ...action.payload};
+    }
 }
 
 function AmpEnvReducer(action, state) {

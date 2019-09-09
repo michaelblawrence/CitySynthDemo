@@ -58,6 +58,9 @@ async function handleMessage(msg) {
         case 'GET_PARAM':
             getParam(data, this.port);
             return;
+        case 'DUMP_PARAMS':
+            dumpAllParam(data, this.port);
+            return;
     }
     console.error('got message with unknown type');
 }
@@ -121,6 +124,23 @@ function getParam(data, port) {
         const value = synth.get_state(paramIden);
         port.postMessage({ type: 'PARAM_CALLBACK', param, paramIden, value });
         return value;
+    }
+}
+
+function dumpAllParam(data, port) {
+    const { dumpAll } = data;
+    const paramIdens = Object.keys(Param)
+        .map(param => ({param: param, paramIden: Param[param]}));
+
+    /**
+     * @type CitySynth
+     */
+    const synth = globalThis.synth;
+    if (synth && dumpAll === true) {
+        const values = paramIdens.map(item => ({...item, value: synth.get_state(item.paramIden)}));
+        const dump = values.reduce((dict, kvp) => ({...dict, [kvp.param]: kvp.value}), {})
+        port.postMessage({ type: 'DUMP_PARAMS_CALLBACK', dump });
+        return dump;
     }
 }
 

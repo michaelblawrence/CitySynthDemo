@@ -3,9 +3,11 @@
 import { configureStore } from 'redux-starter-kit';
 import { rootReducer } from './redux/reducers';
 import { Param, InversedParam } from './redux/types';
+import { setAllParams } from './redux/actions/MetaActions';
 
 const WorkerActions = {
     MODULE: 'MODULE',
+    DUMP_PARAMS: 'DUMP_PARAMS',
     SET_PRESET: 'SET_PRESET',
     GET_PARAM: 'GET_PARAM',
     SET_PARAM: 'SET_PARAM',
@@ -18,6 +20,7 @@ const WorkerActionFactory = {
     sendKeyUp: (keyCode) => ({ type: WorkerActions.KEY_UP, data: keyCode }),
     getState: (paramIden) => ({ type: WorkerActions.GET_PARAM, data: paramIden }),
     setState: (paramData) => ({ type: WorkerActions.SET_PARAM, data: paramData }),
+    dumpState: () => ({ type: WorkerActions.DUMP_PARAMS, data: {dumpAll: true} }),
     setPreset: (presetLine) => ({ type: WorkerActions.SET_PRESET, data: presetLine }),
 }
 
@@ -33,6 +36,11 @@ export async function getWasmModule() {
     synthNode.port.postMessage(WorkerActionFactory.sendModule(module))
     synthNode.connect(actx.destination);
     initState.synthNode = synthNode;
+
+    getAllParamValues().then(dump => {
+        debugger;
+        store.dispatch(setAllParams(dump));
+    });
 }
 
 const presetPromptChar = '.';
@@ -95,6 +103,32 @@ async function getParamValue(paramIden) {
     });
 }
 
+async function getAllParamValues() {
+    return await new Promise((resolve, reject) => {
+        try {
+            /**
+             * @type {{synthNode: AudioWorkletNode}}
+             */
+            const { synthNode } = initState;
+            if (synthNode) {
+                /**
+                 * @param {MessageEvent} evt
+                 */
+                synthNode.port.onmessage = evt => {
+                    const { data } = evt;
+                    if (typeof data !== 'undefined' && data.type === 'DUMP_PARAMS_CALLBACK' && typeof data.dump !== 'undefined') {
+                        synthNode.port.onmessage = null;
+                        resolve(data.dump);
+                    }
+                }
+                synthNode.port.postMessage(WorkerActionFactory.dumpState());
+            }
+        } catch (ex) {
+            reject(ex);
+        }
+    });
+}
+
 export const store = configureStore({ reducer: rootReducer });
 
 store.subscribe(() => {
@@ -104,7 +138,7 @@ store.subscribe(() => {
     Object.keys(state).map(stateKey => {
         const paramIden = Param[stateKey];
         if (typeof paramIden !== 'undefined') {
-            publishParam(synthNode, paramIden, state, meta);
+            publishParam(synthNode, paramIden, state, meta || {prevState: {}});
         }
     });
 
