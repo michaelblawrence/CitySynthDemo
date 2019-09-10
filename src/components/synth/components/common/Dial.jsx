@@ -1,9 +1,10 @@
-import React, { Component } from 'react';
+import React, { Component, useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { Group, Ellipse } from 'react-konva';
 import { AssetImage } from '../features';
 import { HeaderText } from './HeaderText';
 import { rgbaToHexCode, clampNumber } from '../../../../common';
+import { store, observerSubscribe } from '../../../../store';
 
 const BackgroundImage = (props) => {
   const { ...other } = props;
@@ -84,10 +85,17 @@ export class Dial extends Component {
     this.handleDragMove = this.handleDragMove.bind(this);
   }
 
+  componentDidUpdate(prevProps) {
+    const { value } = this.props;
+    if (prevProps.value !== value) {
+      this.setState({ value });
+    }
+  }
+
   /**
    * @param {{evt: DragEvent}} evt 
    */
-  handleDragMove({ evt, ...others }) {
+  handleDragMove({ evt }) {
     // @ts-check
 
     if (evt.which !== 1) {
@@ -170,12 +178,12 @@ Dial.defaultProps = {
   value: 0
 }
 
-export const ReduxDial = ({store, action, ...others}) => {
+export const ReduxDial = ({ store, action, ...others }) => {
   const handleValueChanged = (value) => store.dispatch(action(value));
   return <Dial {...others} valueChanged={handleValueChanged} />
 }
 
-export const HookedDial = ({store, hook, ...others}) => {
+export const HookedDial = ({ store, hook, ...others }) => {
   const range = hook && hook[2] || [0, 1];
   const currValue = hook[0](store);
 
@@ -189,6 +197,40 @@ export const HookedDial = ({store, hook, ...others}) => {
     {...others}
     valueChanged={handleValueChanged}
     value={nextValue} />
+}
+
+const DialComponent = ({ param, setParam, ...props }) => {
+  return <Dial
+    {...props}
+    valueChanged={setParam}
+    value={param} />;
+}
+
+export const ConnectDial = ({ hook, ...others }) => {
+  const range = hook && hook[2] || [0, 1];
+
+  const scaleFromUnit = value => (range[1] - range[0]) * value + range[0];
+  const scaleToUnit = value => (value - range[0]) / (range[1] - range[0]);
+
+  const [state, setState] = useState(0.5);
+
+  useEffect(() => {
+    const unsubscribe = observerSubscribe((storage) => {
+      const { param } = mapStateToProps(storage);
+      setState(param);
+    });
+    return unsubscribe;
+  });
+
+  function mapStateToProps(state) {
+    const currValue = state && hook[0](state);
+    return { param: hook && (currValue || currValue !== 0) && scaleToUnit(currValue) || 0 };
+  }
+  function mapDispatchToProps(value) {
+    const unit = scaleFromUnit(value);
+    return store.dispatch(hook[1](unit));
+  }
+  return DialComponent({ param: state, setParam: mapDispatchToProps, ...others })
 }
 
 export default Dial;

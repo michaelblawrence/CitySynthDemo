@@ -61,6 +61,9 @@ async function handleMessage(msg) {
         case 'DUMP_PARAMS':
             dumpAllParam(data, this.port);
             return;
+        case 'REFRESH_EG':
+            triggerRefresh();
+            return;
     }
     console.error('got message with unknown type');
 }
@@ -141,6 +144,17 @@ function dumpAllParam(data, port) {
         const dump = values.reduce((dict, kvp) => ({...dict, [kvp.param]: kvp.value}), {})
         port.postMessage({ type: 'DUMP_PARAMS_CALLBACK', dump });
         return dump;
+    }
+}
+
+function triggerRefresh() {
+    /**
+     * @type CitySynth
+     */
+    const synth = globalThis.synth;
+    if (synth) {
+        synth.refresh();
+        console.log(`synth.refresh();`);
     }
 }
 

@@ -1,29 +1,30 @@
 //@ts-check
-import React, { Component } from 'react';
+import React from 'react';
 import { Group } from 'react-konva';
 
-import { HeaderText, Dial, ReduxDial, HookedDial } from '../components';
+import { HeaderText, ConnectDial } from '../components';
 import { ctOrangeWithOpacity } from '../../../common';
-import store from '../../../store';
 import { setParamAttack, setParamDecay, setParamSustain, setParamRelease, setParamRate, setParamWidth } from '../../../redux/actions/AmpEnvActions';
-import { Param } from '../../../redux/types';
+import { Param, InversedParam } from '../../../redux/types';
 
-const AttackHook      = [(state) => state[Param.Attack],          setParamAttack,  [1, 1500]]; 
-const DecayHook       = [(state) => state[Param.Decay],           setParamDecay,   [5, 1500]]; 
-const SustainHook     = [(state) => state[Param.Sustain],         setParamSustain, [0, 1]]; 
-const ReleaseHook     = [(state) => state[Param.Release],         setParamRelease, [2, 1500]];
-const AmpLFORateHook  = [(state) => state[Param.AmpLFOrate],      setParamRate,    [1, 1500]]; 
-const AmpLFOWidthHook   = [(state) => state[Param.AmpLFOwidth],   setParamWidth,   [5, 1500]]; 
+const createHook = (param, actionCreator, [min, max]) => [(state) => state[InversedParam[param]], actionCreator, [min, max]]
+
+const AttackHook = createHook(Param.Attack, setParamAttack, [1, 1500]);
+const DecayHook = createHook(Param.Decay, setParamDecay, [0, 1]);
+const SustainHook = createHook(Param.Sustain, setParamSustain, [2, 1500]);
+const ReleaseHook = createHook(Param.Release, setParamRelease, [1, 1500]);
+const AmpLFORateHook = createHook(Param.AmpLFOrate, setParamRate, [5, 1500]);
+const AmpLFOWidthHook = createHook(Param.AmpLFOwidth, setParamWidth, [0, 1]);
 
 const AmpEnvPanel = () => {
   return (
     <Group>
       <HeaderText x={219} y={300} width={62} centered>AMPLIFIER</HeaderText>
 
-      <HookedDial x={216} y={323} h={70} store={store} hook={AttackHook}>Attack</HookedDial>
-      <HookedDial x={299} y={323} h={70} store={store} hook={DecayHook}>Decay</HookedDial>
-      <HookedDial x={382} y={323} h={70} store={store} hook={SustainHook}>Sustain</HookedDial>
-      <HookedDial x={465} y={323} h={70} store={store} hook={ReleaseHook}>Release</HookedDial>
+      <ConnectDial x={216} y={323} h={70} hook={AttackHook}>Attack</ConnectDial>
+      <ConnectDial x={299} y={323} h={70} hook={DecayHook}>Decay</ConnectDial>
+      <ConnectDial x={382} y={323} h={70} hook={SustainHook}>Sustain</ConnectDial>
+      <ConnectDial x={465} y={323} h={70} hook={ReleaseHook}>Release</ConnectDial>
     </Group>
   );
 }
@@ -34,8 +35,8 @@ const AmpLfoPanel = () => {
       <HeaderText x={349} y={465} width={38} centered
         fillColour={ctOrangeWithOpacity(120)}>LFO</HeaderText>
 
-      <HookedDial x={289} y={405} h={68} store={store} hook={AmpLFORateHook}>Rate</HookedDial>
-      <HookedDial x={392} y={405} h={68} store={store} hook={AmpLFOWidthHook}>Width</HookedDial>
+      <ConnectDial x={289} y={405} h={68} hook={AmpLFORateHook}>Rate</ConnectDial>
+      <ConnectDial x={392} y={405} h={68} hook={AmpLFOWidthHook}>Width</ConnectDial>
     </Group>
   );
 }

@@ -20,19 +20,21 @@ function MetaReducer(action, state) {
     switch (action.type) {
         case types.SET_ALL_PARAMS:
             return {...state, ...action.payload};
+        default:
+            return state;
     }
 }
 
 function AmpEnvReducer(action, state) {
     switch (action.type) {
         case types.SET_PARAM_AMP_ATTACK:
-            return getParamSetter(state, action, Param.Attack);
+            return getParamSetter(state, action, Param.Attack, true);
         case types.SET_PARAM_AMP_DECAY:
-            return getParamSetter(state, action, Param.Decay);
+            return getParamSetter(state, action, Param.Decay, true);
         case types.SET_PARAM_AMP_SUSTAIN:
-            return getParamSetter(state, action, Param.Sustain);
+            return getParamSetter(state, action, Param.Sustain, true);
         case types.SET_PARAM_AMP_RELEASE:
-            return getParamSetter(state, action, Param.Release);
+            return getParamSetter(state, action, Param.Release, true);
         case types.SET_PARAM_LFO_RATE:
             return getParamSetter(state, action, Param.AmpLFOrate);
         case types.SET_PARAM_LFO_WIDTH:

@@ -1,13 +1,21 @@
 // @ts-check
 
-import { configureStore } from 'redux-starter-kit';
+import thunkMiddleware from 'redux-thunk'
+import { composeWithDevTools } from 'redux-devtools-extension';
+import { createEpicMiddleware } from 'redux-observable';
+import { createStore, applyMiddleware } from 'redux';
+import { filter, mapTo, tap } from 'rxjs/operators';
+
 import { rootReducer } from './redux/reducers';
 import { Param, InversedParam } from './redux/types';
 import { setAllParams } from './redux/actions/MetaActions';
+import { validateKeyCode } from './common/DataExtensions/MidiDataExtensions';
+import { Subject, Observable } from 'rxjs';
 
 const WorkerActions = {
     MODULE: 'MODULE',
     DUMP_PARAMS: 'DUMP_PARAMS',
+    REFRESH_EG: 'REFRESH_EG',
     SET_PRESET: 'SET_PRESET',
     GET_PARAM: 'GET_PARAM',
     SET_PARAM: 'SET_PARAM',
@@ -20,8 +28,9 @@ const WorkerActionFactory = {
     sendKeyUp: (keyCode) => ({ type: WorkerActions.KEY_UP, data: keyCode }),
     getState: (paramIden) => ({ type: WorkerActions.GET_PARAM, data: paramIden }),
     setState: (paramData) => ({ type: WorkerActions.SET_PARAM, data: paramData }),
-    dumpState: () => ({ type: WorkerActions.DUMP_PARAMS, data: {dumpAll: true} }),
+    dumpState: () => ({ type: WorkerActions.DUMP_PARAMS, data: { dumpAll: true } }),
     setPreset: (presetLine) => ({ type: WorkerActions.SET_PRESET, data: presetLine }),
+    triggerRefresh: () => ({ type: WorkerActions.REFRESH_EG, data: {} }),
 }
 
 const initState = { hasStarted: false, synthNode: null };
@@ -38,7 +47,6 @@ export async function getWasmModule() {
     initState.synthNode = synthNode;
 
     getAllParamValues().then(dump => {
-        debugger;
         store.dispatch(setAllParams(dump));
     });
 }
@@ -50,7 +58,7 @@ window.addEventListener('keydown', (evt) => {
     // evt.preventDefault();
     const { synthNode } = initState;
     if (synthNode && !evt.repeat) {
-        if (evt.key === presetPromptChar || evt.key === getParamChar) {
+        if (!validateKeyCode(evt.keyCode)) {
             return;
         }
         console.warn('keydown ' + evt.keyCode);
@@ -70,6 +78,9 @@ window.addEventListener('keyup', (evt) => {
         }
         if (evt.key === getParamChar) {
             getParamValue(0).then(console.log);
+            return;
+        }
+        if (!validateKeyCode(evt.keyCode)) {
             return;
         }
         console.warn('keyup ' + evt.keyCode);
@@ -129,7 +140,57 @@ async function getAllParamValues() {
     });
 }
 
-export const store = configureStore({ reducer: rootReducer });
+const epicMiddleware = createEpicMiddleware();
+
+const rootSubject = new Subject();
+
+/**
+ * 
+ * @param {Observable<any>} action$ 
+ */
+const rootEpic = action$ => action$.pipe(
+    tap(rootSubject),
+    tap(nextState => {
+        const { meta, ...state } = nextState;
+        const { synthNode } = initState;
+
+        Object.keys(state).map(stateKey => {
+            const paramIden = Param[stateKey];
+            if (typeof paramIden !== 'undefined') {
+                publishParam(synthNode, paramIden, state, meta || { prevState: {} });
+            }
+        });
+
+        console.log(state);
+    })
+);
+
+export const store = configureStore(undefined);
+
+export function configureStore(preloadedState) {
+    const middlewares = [
+        // thunkMiddleware,
+        // epicMiddleware,
+    ];
+    const middlewareEnhancer = applyMiddleware(...middlewares);
+
+    const enhancers = [middlewareEnhancer];
+    const composedEnhancers = composeWithDevTools(...enhancers);
+
+    const store = createStore(rootReducer, preloadedState, composedEnhancers);
+
+    // epicMiddleware.run(rootEpic);
+
+    return store;
+}
+
+const observers = new Map();
+
+export function observerSubscribe(callback) {
+    const obj = {};
+    observers.set(obj, callback);
+    return () => observers.delete(obj);
+}
 
 store.subscribe(() => {
     const { meta, ...state } = store.getState();
@@ -138,11 +199,11 @@ store.subscribe(() => {
     Object.keys(state).map(stateKey => {
         const paramIden = Param[stateKey];
         if (typeof paramIden !== 'undefined') {
-            publishParam(synthNode, paramIden, state, meta || {prevState: {}});
+            publishParam(synthNode, paramIden, state, meta || { prevState: {} });
         }
     });
-
-    console.log(state);
+    observers.forEach(callback => callback(state));
+    // console.log(state);
 });
 
 export default store;
@@ -150,8 +211,11 @@ export default store;
 function publishParam(worket, paramIden, state, meta) {
     const param = InversedParam[paramIden];
     if (worket && typeof state[param] !== 'undefined' && meta.prevState[param] !== state[param]) {
-        console.warn('current ' + state[param]);
+        // console.warn('current ' + state[param]);
         worket.port.postMessage(WorkerActionFactory.setState({ param, value: state[param] }));
+        if (meta.refresh) {
+            worket.port.postMessage(WorkerActionFactory.triggerRefresh());
+        }
     }
 }
 
