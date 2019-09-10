@@ -151,18 +151,9 @@ const rootSubject = new Subject();
 const rootEpic = action$ => action$.pipe(
     tap(rootSubject),
     tap(nextState => {
-        const { meta, ...state } = nextState;
-        const { synthNode } = initState;
-
-        Object.keys(state).map(stateKey => {
-            const paramIden = Param[stateKey];
-            if (typeof paramIden !== 'undefined') {
-                publishParam(synthNode, paramIden, state, meta || { prevState: {} });
-            }
-        });
-
-        console.log(state);
-    })
+        console.log(nextState);
+    }),
+    filter(() => false)
 );
 
 export const store = configureStore(undefined);
@@ -170,7 +161,7 @@ export const store = configureStore(undefined);
 export function configureStore(preloadedState) {
     const middlewares = [
         // thunkMiddleware,
-        // epicMiddleware,
+        epicMiddleware,
     ];
     const middlewareEnhancer = applyMiddleware(...middlewares);
 
@@ -179,17 +170,17 @@ export function configureStore(preloadedState) {
 
     const store = createStore(rootReducer, preloadedState, composedEnhancers);
 
-    // epicMiddleware.run(rootEpic);
+    epicMiddleware.run(rootEpic);
 
     return store;
 }
 
-const observers = new Map();
+const subscriptions = new Map();
 
 export function observerSubscribe(callback) {
     const obj = {};
-    observers.set(obj, callback);
-    return () => observers.delete(obj);
+    subscriptions.set(obj, callback);
+    return () => subscriptions.delete(obj);
 }
 
 store.subscribe(() => {
@@ -202,7 +193,7 @@ store.subscribe(() => {
             publishParam(synthNode, paramIden, state, meta || { prevState: {} });
         }
     });
-    observers.forEach(callback => callback(state));
+    subscriptions.forEach(callback => callback(state));
     // console.log(state);
 });
 
