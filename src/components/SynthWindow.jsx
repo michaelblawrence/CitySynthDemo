@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { BaseWindow, ToggleIcon } from './synth';
 import { OscGroupPanel, EnvGroupPanel, MasterGroupPanel, PitchGroupPanel, FilterTouchGroupPanel, AmpEnvGroupPanel } from './synth/window-panels';
-import { getWasmModule } from '../store';
+import { getWasmModule } from "../workerActions";
 
 export class SynthWindow extends Component {
   render() {

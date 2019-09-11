@@ -135,9 +135,10 @@ export class Dial extends Component {
   }
 
   render() {
-    let { x, y, hideBackground, noInactive } = this.props;
-    let img_w = BackgroundImage.imgWidthPx;
-    let bg_y = this.h - BackgroundImage.imgHeightPx;
+    const { x, y, hideBackground, noInactive } = this.props;
+    const img_w = BackgroundImage.imgWidthPx;
+    const bg_y = this.h - BackgroundImage.imgHeightPx;
+    const rotation = clampNumber(this.state.value) * 274;
     return (
       <Group x={x} y={y} onMouseDown={this.handleDragStart} onMouseMove={this.handleDragMove}>
         {hideBackground ? null : <BackgroundImage x={0} y={bg_y} />}
@@ -155,7 +156,7 @@ export class Dial extends Component {
             ? <DialStandbyOverlay y={bg_y} onClick={() => this.setState(() => ({ inactive: false }))} />
             : null
         }
-        <DialMarkerImage x={37 - img_w / 2} y={bg_y + 20} rotation={this.state.value * 274} />
+        <DialMarkerImage x={37 - img_w / 2} y={bg_y + 20} rotation={rotation} />
         {/* <Rect fill="rgba(0.1, 0.1, 0.1, 0.5)" width={this.w} height={this.h} /> */}
       </Group>
     );

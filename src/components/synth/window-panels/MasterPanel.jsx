@@ -2,6 +2,13 @@ import React, { Component } from 'react';
 import { Group } from 'react-konva';
 import { HeaderText, Dial, ToggleIcon, PanelDivider } from '../components';
 import { ctOrangeWithOpacity } from '../../../common';
+import { createStoreHook } from '../../../redux/actions/helper';
+import { Param } from '../../../redux/types';
+import { setParamFilterModeWidth, setParamFilterModRate } from '../../../redux/actions/MasterActions';
+
+const FilterModRateHook = createStoreHook(Param.LPF, setParamFilterModRate, [5, 21000]);
+const FilterCutoffHook = createStoreHook(Param.LPF, setParamFilterModeWidth, [5, 21000]);
+// const FilterCutoffHook = createStoreHook(Param.LPF, setParamFilterCutoff, [5, 21000]);
 
 class LfoPanel extends Component {
   render() {

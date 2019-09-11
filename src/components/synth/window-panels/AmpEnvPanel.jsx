@@ -5,16 +5,15 @@ import { Group } from 'react-konva';
 import { HeaderText, ConnectDial } from '../components';
 import { ctOrangeWithOpacity } from '../../../common';
 import { setParamAttack, setParamDecay, setParamSustain, setParamRelease, setParamRate, setParamWidth } from '../../../redux/actions/AmpEnvActions';
-import { Param, InversedParam } from '../../../redux/types';
+import { Param } from '../../../redux/types';
+import { createStoreHook } from '../../../redux/actions/helper';
 
-const createHook = (param, actionCreator, [min, max]) => [(state) => state[InversedParam[param]], actionCreator, [min, max]]
-
-const AttackHook = createHook(Param.Attack, setParamAttack, [1, 1500]);
-const DecayHook = createHook(Param.Decay, setParamDecay, [0, 1]);
-const SustainHook = createHook(Param.Sustain, setParamSustain, [2, 1500]);
-const ReleaseHook = createHook(Param.Release, setParamRelease, [1, 1500]);
-const AmpLFORateHook = createHook(Param.AmpLFOrate, setParamRate, [5, 1500]);
-const AmpLFOWidthHook = createHook(Param.AmpLFOwidth, setParamWidth, [0, 1]);
+const AttackHook = createStoreHook(Param.Attack, setParamAttack, [1, 1500]);
+const DecayHook = createStoreHook(Param.Decay, setParamDecay, [2, 1500]);
+const SustainHook = createStoreHook(Param.Sustain, setParamSustain, [0, 1]);
+const ReleaseHook = createStoreHook(Param.Release, setParamRelease, [1, 1500]);
+const AmpLFORateHook = createStoreHook(Param.AmpLFOrate, setParamRate, [5, 1500]);
+const AmpLFOWidthHook = createStoreHook(Param.AmpLFOwidth, setParamWidth, [0, 1]);
 
 const AmpEnvPanel = () => {
   return (
