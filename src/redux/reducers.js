@@ -84,11 +84,22 @@ function MasterReducer(action, state) {
 
 function OscReducer(action, state) {
     switch (action.type) {
-        case types.SET_PARAM_DELAY_LENGTH:
-            console.warn('unimplemented!');
+        case types.SET_PARAM_OSC_PHASE:
+            return getParamSetter(state, action, Param.HarmonicPhase);
+        case types.SET_PARAM_OSC_WAVEFUNCTION:
+            return getParamSetter(state, action, Param.WFunction);
+        default:
             return state;
-        case types.SET_PARAM_DELAY_WET:
-            return getParamSetter(state, action, Param.DelayWet);
+    }
+}
+
+
+function PitchReducer(action, state) {
+    switch (action.type) {
+        case types.SET_PARAM_PITCH_LFO_RATE:
+            return getParamSetter(state, action, Param.Pitchmod);
+        case types.SET_PARAM_PITCH_LFO_WIDTH:
+            return getParamSetter(state, action, Param.PitchmodWidth);
         default:
             return state;
     }

@@ -184,29 +184,6 @@ export const ReduxDial = ({ store, action, ...others }) => {
   return <Dial {...others} valueChanged={handleValueChanged} />
 }
 
-export const HookedDial = ({ store, hook, ...others }) => {
-  const range = hook && hook[2] || [0, 1];
-  const currValue = hook[0](store);
-
-  const scaleFromUnit = value => (range[1] - range[0]) * value + range[0];
-  const scaleToUnit = value => (value - range[0]) / (range[1] - range[0]);
-  const handleValueChanged = (value) => store.dispatch(hook && hook[1](scaleFromUnit(value)));
-
-  const nextValue = hook && (currValue || currValue !== 0) && scaleToUnit(currValue) || 0;
-
-  return <Dial
-    {...others}
-    valueChanged={handleValueChanged}
-    value={nextValue} />
-}
-
-const DialComponent = ({ param, setParam, ...props }) => {
-  return <Dial
-    {...props}
-    valueChanged={setParam}
-    value={param} />;
-}
-
 export const ConnectDial = ({ hook, ...others }) => {
   const range = hook && hook[2] || [0, 1];
 
@@ -231,7 +208,11 @@ export const ConnectDial = ({ hook, ...others }) => {
     const unit = scaleFromUnit(value);
     return store.dispatch(hook[1](unit));
   }
-  return DialComponent({ param: state, setParam: mapDispatchToProps, ...others })
+  return <Dial
+    {...others}
+    valueChanged={mapDispatchToProps}
+    value={state}
+  />;
 }
 
 export default Dial;
