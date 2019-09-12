@@ -8,7 +8,7 @@ import { createStoreHook } from '../../../redux/actions/helper';
 import { Param } from '../../../redux/types';
 
 const OscPhaseHook = createStoreHook(Param.PitchmodWidth, setParamOscPhase, [0, 1]);
-const OscWaveSelectorHook = createStoreHook(Param.PitchmodWidth, setParamOscWaveFunction, [0, 6]);
+const OscWaveSelectorHook = createStoreHook(Param.PitchmodWidth, setParamOscWaveFunction, [0, 5]);
 const OscGainHook = createStoreHook(Param.Gain, setParamOscGain, [0, 1]);
 
 const OscPanel = () => {
@@ -25,7 +25,7 @@ const OscPanel = () => {
 };
 
 // const OscPhaseHook = createStoreHook(Param., setParamDelayLength, [0, 1]);
-const DelayWetAmountHook = createStoreHook(Param.DelayWet, setParamDelayWetAmt, [0, 1.1]);
+const DelayWetAmountHook = createStoreHook(Param.DelayWet, setParamDelayWetAmt, [0, 1.1 * 100]);
 
 const DelayPanel = () => {
   return (

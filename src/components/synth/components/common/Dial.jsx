@@ -196,7 +196,7 @@ ReduxDial.propTypes = {
   action: PropTypes.func,
 };
 
-export const ConnectDial = ({ hook, ...others }) => {
+export const connectStore = ({ hook, ...others }) => (componentCreator) => {
   const range = (hook && hook[2]) || [0, 1];
 
   const scaleFromUnit = value => (range[1] - range[0]) * value + range[0];
@@ -221,12 +221,19 @@ export const ConnectDial = ({ hook, ...others }) => {
     const unit = scaleFromUnit(value);
     return store.dispatch(hook[1](unit));
   }
-  return <Dial
-    {...others}
-    valueChanged={mapDispatchToProps}
-    value={state}
-  />;
+  const props = {
+    ...others,
+    valueChanged: mapDispatchToProps,
+    value: state
+  };
+  return componentCreator(props);
 };
+
+export const ConnectDial = ({ hook, ...others }) => connectStore({ hook, ...others })(
+  props => (
+    <Dial {...props} />
+  )
+);
 
 ConnectDial.propTypes = {
   hook: PropTypes.array,

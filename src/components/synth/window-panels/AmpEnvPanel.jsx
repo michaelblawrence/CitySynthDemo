@@ -10,7 +10,7 @@ import { createStoreHook } from '../../../redux/actions/helper';
 
 const AttackHook = createStoreHook(Param.Attack, setParamAttack, [1, 1500]);
 const DecayHook = createStoreHook(Param.Decay, setParamDecay, [2, 1500]);
-const SustainHook = createStoreHook(Param.Sustain, setParamSustain, [0, 1]);
+const SustainHook = createStoreHook(Param.Sustain, setParamSustain, [0, 1 * 100]);
 const ReleaseHook = createStoreHook(Param.Release, setParamRelease, [1, 1500]);
 const AmpLFORateHook = createStoreHook(Param.AmpLFOrate, setParamRate, [5, 1500]);
 const AmpLFOWidthHook = createStoreHook(Param.AmpLFOwidth, setParamWidth, [0, 1]);

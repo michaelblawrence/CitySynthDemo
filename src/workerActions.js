@@ -134,7 +134,7 @@ window.addEventListener('keyup', (evt) => {
   const { synthNode } = initState;
   if (synthNode && !evt.repeat) {
     if (evt.key === presetPromptChar) {
-      const samplePresetLine = '56:T-Organic:318|a:1;d:94;s:0.86;r:2;h:2;hc:0.2190476;hp:0;w:2;hw:0;b:-1;lpf:13441.8;lfo:0;prate:0;pwidth:0;arate:30;awidth:0;lwidth:500;la:5;lr:5;lf:5;lc:5000;delay:120;dwet:0.2057;rwet:0.352;filter:0;lpfenv:0;sub:0.3668478';
+      const samplePresetLine = '56:T-Organic:318|a:1;d:94;s:0.86;r:2;h:2;hc:0.2190476;hp:0;w:2;hw:0;b:-1;lpf:13441.8;lfo:0;prate:0;pwidth:0;arate:30;awidth:0;lwidth:500;la:5;lr:5;lf:5;lc:5000;delay:120;dwet:0.2057;rwet:0.04;filter:0;lpfenv:0;sub:0.3668478';
       const presetLine = prompt('preset data: ', samplePresetLine);
       postWorkerAction(synthNode, WorkerActionFactory.setPreset(presetLine));
       syncParamsState();
