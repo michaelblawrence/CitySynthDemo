@@ -62,8 +62,8 @@ HeaderText.propTypes = {
     g: PropTypes.number,
     b: PropTypes.number,
   })
-}
+};
 
 HeaderText.defaultProps = {
   fillColour: { r: 238, g: 129, b: 12 },
-}
+};

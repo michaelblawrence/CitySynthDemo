@@ -5,12 +5,12 @@ import { AssetImage } from '../features';
 import { HeaderText } from './HeaderText';
 import { Group } from 'react-konva';
 
-function ToggleImage(props) {
+const ToggleImage = (props) => {
   const { on, ...other } = props;
   if (on) {
-    return <AssetImage componentScope={'ToggleIcon'} assetName={'toggle-on'} {...other} />
+    return <AssetImage componentScope={'ToggleIcon'} assetName={'toggle-on'} {...other} />;
   } else {
-    return <AssetImage componentScope={'ToggleIcon'} assetName={'toggle-off'} {...other} />
+    return <AssetImage componentScope={'ToggleIcon'} assetName={'toggle-off'} {...other} />;
   }
 };
 
@@ -38,7 +38,7 @@ export class ToggleIcon extends Component {
 
     this.w = this.props.w;
     this.h = this.props.h;
-    this.state.text = typeof(props.text) === 'string'
+    this.state.text = typeof (props.text) === 'string'
       ? props.text
       : (typeof props.children === 'string' && props.children) || this.state.text;
   }
@@ -76,7 +76,7 @@ export class ToggleIcon extends Component {
           checked: !state.checked
         });
       });
-  }
+    }
   }
 
   render() {
@@ -107,7 +107,10 @@ ToggleIcon.propTypes = {
   h: PropTypes.number,
   x: PropTypes.number,
   y: PropTypes.number,
+  text: PropTypes.string,
   enabled: PropTypes.bool,
+  onClick: PropTypes.func,
+  children: PropTypes.node.isRequired
 };
 
 ToggleIcon.defaultProps = {

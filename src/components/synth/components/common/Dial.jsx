@@ -8,14 +8,14 @@ import { store, observerSubscribe } from '../../../../store';
 
 const BackgroundImage = (props) => {
   const { ...other } = props;
-  return <AssetImage componentScope={'Dial'} assetName={'dial-bg-markings'} {...other} />
+  return <AssetImage componentScope={'Dial'} assetName={'dial-bg-markings'} {...other} />;
 };
 BackgroundImage.imgWidthPx = 57;
 BackgroundImage.imgHeightPx = 65;
 
 const RoundDialImage = (props) => {
   const { ...other } = props;
-  return <AssetImage componentScope={'Dial'} assetName={'round-blank-dial'} {...other} />
+  return <AssetImage componentScope={'Dial'} assetName={'round-blank-dial'} {...other} />;
 };
 RoundDialImage.imgWidthPx = 57;
 RoundDialImage.imgHeightPx = 65;
@@ -25,14 +25,19 @@ const DialMarkerImage = (props) => {
   const offset = {
     x: 20,
     y: 20,
-  }
+  };
   return (
     <AssetImage componentScope={'Dial'} assetName={'dial-fg-marker'} {...other}
       x={x + offset.x} y={y + offset.y} offsetX={offset.x} offsetY={offset.y} />
-  )
+  );
 };
 DialMarkerImage.imgWidthPx = 39;
 DialMarkerImage.imgHeightPx = 39;
+
+DialMarkerImage.propTypes = {
+  x: PropTypes.number,
+  y: PropTypes.number,
+};
 
 function DialStandbyOverlay(props) {
   const { x, y } = props;
@@ -51,12 +56,13 @@ function DialStandbyOverlay(props) {
 DialStandbyOverlay.propTypes = {
   x: PropTypes.number,
   y: PropTypes.number,
-}
+  onClick: PropTypes.func,
+};
 
 DialStandbyOverlay.defaultProps = {
   x: 0,
   y: 0,
-}
+};
 
 export class Dial extends Component {
   state = {
@@ -119,7 +125,7 @@ export class Dial extends Component {
         && this.props.valueChanged(nextValue);
       return {
         value: clampNumber(nextValue),
-      }
+      };
     });
 
     this.offsetY = offsetY;
@@ -173,16 +179,22 @@ Dial.propTypes = {
   text: PropTypes.string,
   hideBackground: PropTypes.bool,
   noInactive: PropTypes.bool,
+  children: PropTypes.node.isRequired
 };
 
 Dial.defaultProps = {
   value: 0
-}
+};
 
 export const ReduxDial = ({ store, action, ...others }) => {
   const handleValueChanged = (value) => store.dispatch(action(value));
-  return <Dial {...others} valueChanged={handleValueChanged} />
-}
+  return <Dial {...others} valueChanged={handleValueChanged} />;
+};
+
+ReduxDial.propTypes = {
+  store: PropTypes.object,
+  action: PropTypes.func,
+};
 
 export const ConnectDial = ({ hook, ...others }) => {
   const range = (hook && hook[2]) || [0, 1];
@@ -214,6 +226,10 @@ export const ConnectDial = ({ hook, ...others }) => {
     valueChanged={mapDispatchToProps}
     value={state}
   />;
-}
+};
+
+ConnectDial.propTypes = {
+  hook: PropTypes.array,
+};
 
 export default Dial;

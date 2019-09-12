@@ -3,11 +3,11 @@
 import { composeWithDevTools } from 'redux-devtools-extension';
 import { createEpicMiddleware } from 'redux-observable';
 import { createStore, applyMiddleware } from 'redux';
+import { Subject } from 'rxjs';
 import { filter, tap } from 'rxjs/operators';
 
 import { rootReducer } from './redux/reducers';
 import { Param } from './redux/types';
-import { Subject } from 'rxjs';
 import { initState, publishParam } from './workerActions';
 
 const epicMiddleware = createEpicMiddleware();

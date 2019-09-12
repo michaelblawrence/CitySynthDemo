@@ -193,35 +193,35 @@ export const Keys = {
   Shift: 65536,
   Control: 131072,
   Alt: 262144
-}
+};
 
 /**
 * @param {number} keyCode
 */
 export function validateKeyCode(keyCode) {
   switch (keyCode) {
-      //Keyboard Keys
-      case Keys.Q:
-      case Keys.A:
-      case Keys.W:
-      case Keys.S:
-      case Keys.E:
-      case Keys.D:
-      case Keys.F:
-      case Keys.T:
-      case Keys.G:
-      case Keys.Y:
-      case Keys.H:
-      case Keys.U:
-      case Keys.J:
-      case Keys.K:
-      case Keys.O:
-      case Keys.L:
-      case Keys.P:
-      case Keys.OemSemicolon:
-      case Keys.Oemtilde:
-          return true;
-      default:
-        return false;
+  //Keyboard Keys
+  case Keys.Q:
+  case Keys.A:
+  case Keys.W:
+  case Keys.S:
+  case Keys.E:
+  case Keys.D:
+  case Keys.F:
+  case Keys.T:
+  case Keys.G:
+  case Keys.Y:
+  case Keys.H:
+  case Keys.U:
+  case Keys.J:
+  case Keys.K:
+  case Keys.O:
+  case Keys.L:
+  case Keys.P:
+  case Keys.OemSemicolon:
+  case Keys.Oemtilde:
+    return true;
+  default:
+    return false;
   }
 }

@@ -1,6 +1,6 @@
+// @ts-check
 import { InversedParam } from './types';
 
-// @ts-check
 export const getParamSetter = (state, action, param, refresh = false) => ({
   ...state,
   meta: {
