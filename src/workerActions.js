@@ -1,8 +1,13 @@
+// @ts-check
+
 import { InversedParam } from './redux/types';
 import { setAllParams } from './redux/actions/MetaActions';
 import { validateKeyCode } from './common/DataExtensions/MidiDataExtensions';
 import { store } from './store';
 
+/**
+ * @type {{hasStarted: boolean, synthNode: AudioWorkletNode}}
+ */
 export const initState = { hasStarted: false, synthNode: null };
 const presetPromptChar = '.';
 const getParamChar = ',';

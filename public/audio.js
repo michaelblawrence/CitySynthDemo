@@ -176,8 +176,7 @@ async function initModule(module) {
         }
     });
     globalThis.wasm = instance.exports;
-    const synth = CitySynth.new(2);
-    globalThis.synth = synth;
+    globalThis.synth = CitySynth.new(2);
 }
 
 

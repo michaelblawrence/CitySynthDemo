@@ -1,4 +1,4 @@
-export const SET_ALL_PARAMS   = 'SET_ALL_PARAMS';
+export const SET_ALL_PARAMS              = 'SET_ALL_PARAMS';
 
 export const SET_PARAM_AMP_ATTACK        = 'SET_PARAM_AMP_ATTACK';
 export const SET_PARAM_AMP_DECAY         = 'SET_PARAM_AMP_DECAY';
