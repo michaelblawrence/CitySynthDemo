@@ -1,7 +1,7 @@
 // @ts-check
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Text, Group, Rect } from 'react-konva';
+import { Text, Group } from 'react-konva';
 import { rgbaToHexCode } from '../../../../common';
 
 export class HeaderText extends Component {

@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { AssetImage } from '../features';
 import { HeaderText } from './HeaderText';
-import { Group, Rect } from 'react-konva';
+import { Group } from 'react-konva';
 
 function ToggleImage(props) {
   const { on, ...other } = props;

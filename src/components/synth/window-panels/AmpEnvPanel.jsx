@@ -26,7 +26,7 @@ const AmpEnvPanel = () => {
       <ConnectDial x={465} y={323} h={70} hook={ReleaseHook}>Release</ConnectDial>
     </Group>
   );
-}
+};
 
 const AmpLfoPanel = () => {
   return (
@@ -38,7 +38,7 @@ const AmpLfoPanel = () => {
       <ConnectDial x={392} y={405} h={68} hook={AmpLFOWidthHook}>Width</ConnectDial>
     </Group>
   );
-}
+};
 
 export const AmpEnvGroupPanel = () => {
   return (
@@ -47,4 +47,4 @@ export const AmpEnvGroupPanel = () => {
       <AmpLfoPanel />
     </Group>
   );
-}
+};

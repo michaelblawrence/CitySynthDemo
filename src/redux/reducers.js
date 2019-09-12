@@ -15,6 +15,7 @@ export function rootReducer(state, action) {
         OscReducer,
         MasterReducer,
         MetaReducer,
+        PitchReducer,
     ];
     return reducers.reduce((state, reducer) => reducer(action, state), state);
 }

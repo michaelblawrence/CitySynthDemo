@@ -221,6 +221,7 @@ export function validateKeyCode(keyCode) {
       case Keys.OemSemicolon:
       case Keys.Oemtilde:
           return true;
+      default:
+        return false;
   }
-  return false;
 }

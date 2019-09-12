@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React from 'react';
 import { Group } from 'react-konva';
 
 import { HeaderText, ConnectDial } from '../components';
@@ -9,25 +9,21 @@ import { setParamPitchRate, setParamPitchWidth } from '../../../redux/actions/Pi
 const PitchRateModHook = createStoreHook(Param.Pitchmod, setParamPitchRate, [0, 20]);
 const PitchWidthModHook = createStoreHook(Param.PitchmodWidth, setParamPitchWidth, [0, 0.2]);
 
-class PitchPanel extends Component {
-  render() {
-    return (
-      <Group>
-        <HeaderText x={131} y={300} width={37} centered>PITCH</HeaderText>
+const PitchPanel = () => {
+  return (
+    <Group>
+      <HeaderText x={131} y={300} width={37} centered>PITCH</HeaderText>
 
-        <ConnectDial x={123} y={323} h={68} hook={PitchRateModHook}>Rate</ConnectDial>
-        <ConnectDial x={123} y={400} h={68} hook={PitchWidthModHook}>Width</ConnectDial>
-      </Group>
-    );
-  }
-}
+      <ConnectDial x={123} y={323} h={68} hook={PitchRateModHook}>Rate</ConnectDial>
+      <ConnectDial x={123} y={400} h={68} hook={PitchWidthModHook}>Width</ConnectDial>
+    </Group>
+  );
+};
 
-export class PitchGroupPanel extends Component {
-  render() {
-    return (
-      <Group>
-        <PitchPanel />
-      </Group>
-    );
-  }
-}
+export const PitchGroupPanel = () => {
+  return (
+    <Group>
+      <PitchPanel />
+    </Group>
+  );
+};

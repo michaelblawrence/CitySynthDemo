@@ -7,7 +7,7 @@ import { filter, tap } from 'rxjs/operators';
 
 import { rootReducer } from './redux/reducers';
 import { Param } from './redux/types';
-import { Subject, Observable } from 'rxjs';
+import { Subject } from 'rxjs';
 import { initState, publishParam } from './workerActions';
 
 const epicMiddleware = createEpicMiddleware();
@@ -15,50 +15,48 @@ const epicMiddleware = createEpicMiddleware();
 const rootSubject = new Subject();
 
 const state$ = rootSubject.pipe(
-    tap(({meta, ...state}) => {
-        const { synthNode } = initState;
-        
-        Object.keys(state).map(stateKey => {
-            const paramIden = Param[stateKey];
-            if (typeof paramIden !== 'undefined') {
-                publishParam(synthNode, paramIden, state, meta || { prevState: {} });
-            }
-        });
-    })
+  tap(({ meta, ...state }) => {
+    const { synthNode } = initState;
+
+    Object.keys(state).forEach(stateKey => {
+      const paramIden = Param[stateKey];
+      if (typeof paramIden !== 'undefined') {
+        publishParam(synthNode, paramIden, state, meta || { prevState: {} });
+      }
+    });
+  })
 );
 
-/**
- * @param {Observable<any>} action$ 
- */
 const rootEpic = action$ => action$.pipe(
-    filter(() => false)
+  filter(() => false)
 );
 
 export function configureStore(preloadedState) {
-    const middlewares = [
-        epicMiddleware,
-    ];
-    const middlewareEnhancer = applyMiddleware(...middlewares);
+  const middlewares = [
+    epicMiddleware,
+  ];
+  const middlewareEnhancer = applyMiddleware(...middlewares);
 
-    const enhancers = [middlewareEnhancer];
-    const composedEnhancers = composeWithDevTools(...enhancers);
+  const enhancers = [middlewareEnhancer];
+  const composedEnhancers = composeWithDevTools(...enhancers);
 
-    const store = createStore(rootReducer, preloadedState, composedEnhancers);
+  const store = createStore(rootReducer, preloadedState, composedEnhancers);
 
-    epicMiddleware.run(rootEpic);
+  epicMiddleware.run(rootEpic);
 
-    return store;
+  return store;
 }
 
 export function observerSubscribe(callback) {
-    const actionSub = state$.subscribe(({meta, ...state}) => callback(state));
-    return () => actionSub.unsubscribe();
+  // eslint-disable-next-line no-unused-vars
+  const actionSub = state$.subscribe(({ meta, ...state }) => callback(state));
+  return () => actionSub.unsubscribe();
 }
 
 export const store = configureStore(undefined);
 
 store.subscribe(() => {
-    rootSubject.next(store.getState());
+  rootSubject.next(store.getState());
 });
 
 export default store;

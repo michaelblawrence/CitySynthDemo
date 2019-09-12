@@ -185,7 +185,7 @@ export const ReduxDial = ({ store, action, ...others }) => {
 }
 
 export const ConnectDial = ({ hook, ...others }) => {
-  const range = hook && hook[2] || [0, 1];
+  const range = (hook && hook[2]) || [0, 1];
 
   const scaleFromUnit = value => (range[1] - range[0]) * value + range[0];
   const scaleToUnit = value => (value - range[0]) / (range[1] - range[0]);
@@ -202,7 +202,8 @@ export const ConnectDial = ({ hook, ...others }) => {
 
   function mapStateToProps(state) {
     const currValue = state && hook[0](state);
-    return { param: hook && (currValue || currValue !== 0) && scaleToUnit(currValue) || 0 };
+    const param = hook && (currValue || currValue !== 0) && scaleToUnit(currValue);
+    return { param: param || 0 };
   }
   function mapDispatchToProps(value) {
     const unit = scaleFromUnit(value);
