@@ -41,11 +41,13 @@ const WorkerActionFactory = {
 function postWorkerAction(workletNode, workerAction) {
   workletNode.port.postMessage(workerAction);
 }
+
 async function getModule() {
   const response = await fetch('wasm-synth/citysynth_wasm_bg.wasm');
   const bytes = await response.arrayBuffer();
   return await WebAssembly.compile(bytes);
 }
+
 export async function getWasmModule() {
   const actx = new (window.AudioContext || window['webkitAudioContext'])();
   await actx.audioWorklet.addModule('audio.js');
@@ -56,6 +58,7 @@ export async function getWasmModule() {
   initState.synthNode = synthNode;
   syncParamsState();
 }
+
 export async function getParamValue(paramIden) {
   return await new Promise((resolve, reject) => {
     try {
@@ -82,6 +85,7 @@ export async function getParamValue(paramIden) {
     }
   });
 }
+
 async function getAllParamValues() {
   return await new Promise((resolve, reject) => {
     try {
@@ -108,10 +112,12 @@ async function getAllParamValues() {
     }
   });
 }
+
 async function syncParamsState() {
   const dump = await getAllParamValues();
   store.dispatch(setAllParams(dump));
 }
+
 export function publishParam(worket, paramIden, state, meta) {
   const param = InversedParam[paramIden];
   if (worket && typeof state[param] !== 'undefined' && meta.prevState[param] !== state[param]) {
@@ -121,6 +127,7 @@ export function publishParam(worket, paramIden, state, meta) {
     }
   }
 }
+
 window.addEventListener('keydown', (evt) => {
   const { synthNode } = initState;
   if (synthNode && !evt.repeat) {
@@ -130,6 +137,7 @@ window.addEventListener('keydown', (evt) => {
     postWorkerAction(synthNode, WorkerActionFactory.sendKeyDown(evt.keyCode));
   }
 });
+
 window.addEventListener('keyup', (evt) => {
   const { synthNode } = initState;
   if (synthNode && !evt.repeat) {

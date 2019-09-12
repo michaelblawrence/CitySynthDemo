@@ -71,6 +71,7 @@ export class Dial extends Component {
     inactive: true,
     mouseDown: false,
   };
+
   constructor(props) {
     super(props);
 

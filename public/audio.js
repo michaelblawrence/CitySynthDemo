@@ -411,6 +411,7 @@ function freeCitySynth(ptr) {
   static new(arg0, arg1) {
     return CitySynth.__wrap(wasm.citysynth_new(arg0, !isLikeNone(arg1), isLikeNone(arg1) ? 0 : arg1));
   }
+
   /**
     * @param {Float32Array} arg0
     * @returns {void}
@@ -428,6 +429,7 @@ function freeCitySynth(ptr) {
     }
 
   }
+
   /**
     * @param {number} arg0
     * @returns {void}
@@ -435,6 +437,7 @@ function freeCitySynth(ptr) {
   set_buffer_len(arg0) {
     return wasm.citysynth_set_buffer_len(this.ptr, arg0);
   }
+
   /**
     * @param {number} arg0
     * @param {number | undefined} arg1
@@ -443,6 +446,7 @@ function freeCitySynth(ptr) {
   note_on(arg0, arg1) {
     return wasm.citysynth_note_on(this.ptr, arg0, !isLikeNone(arg1), isLikeNone(arg1) ? 0 : arg1);
   }
+
   /**
     * @param {number} arg0
     * @returns {void}
@@ -450,6 +454,7 @@ function freeCitySynth(ptr) {
   note_off(arg0) {
     return wasm.citysynth_note_off(this.ptr, arg0);
   }
+
   /**
     * @param {number} arg0
     * @returns {number}
@@ -457,6 +462,7 @@ function freeCitySynth(ptr) {
   set_freq(arg0) {
     return wasm.citysynth_set_freq(this.ptr, arg0);
   }
+
   /**
     * @param {number} arg0
     * @returns {number}
@@ -464,6 +470,7 @@ function freeCitySynth(ptr) {
   get_state(arg0) {
     return wasm.citysynth_get_state(this.ptr, arg0);
   }
+
   /**
     * @param {number} arg0
     * @param {number} arg1
@@ -472,12 +479,14 @@ function freeCitySynth(ptr) {
   set_state(arg0, arg1) {
     return wasm.citysynth_set_state(this.ptr, arg0, arg1);
   }
+
   /**
     * @returns {void}
     */
   refresh() {
     return wasm.citysynth_refresh(this.ptr);
   }
+
   /**
     * @param {string} arg0
     * @returns {string}
@@ -496,6 +505,7 @@ function freeCitySynth(ptr) {
     return realRet;
 
   }
+
   /**
     * @param {string} arg0
     * @returns {string}
