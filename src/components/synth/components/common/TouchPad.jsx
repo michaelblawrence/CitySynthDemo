@@ -4,8 +4,8 @@ import PropTypes from 'prop-types';
 import { AssetImage } from '../features';
 import { Group } from 'react-konva';
 
-function TouchPadBackground(props) {
-  return <AssetImage componentScope={'TouchPad'} assetName={'touchpad-bg'} {...props} />
+const TouchPadBackground = (props) => {
+  return <AssetImage componentScope={'TouchPad'} assetName={'touchpad-bg'} {...props} />;
 };
 
 export const TouchPad = ({ x, y }) => {
@@ -14,7 +14,7 @@ export const TouchPad = ({ x, y }) => {
       <TouchPadBackground />
     </Group>
   );
-}
+};
 
 TouchPad.propTypes = {
   x: PropTypes.number,

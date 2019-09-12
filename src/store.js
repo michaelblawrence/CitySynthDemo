@@ -15,6 +15,7 @@ const epicMiddleware = createEpicMiddleware();
 const rootSubject = new Subject();
 
 const state$ = rootSubject.pipe(
+  // @ts-ignore
   tap(({ meta, ...state }) => {
     const { synthNode } = initState;
 

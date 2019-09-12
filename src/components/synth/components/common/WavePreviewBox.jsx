@@ -4,8 +4,8 @@ import PropTypes from 'prop-types';
 import { AssetImage } from '../features';
 import { Group } from 'react-konva';
 
-function WaveBoxBackground(props) {
-  return <AssetImage componentScope={'WavePreviewBox'} assetName={'previewbox-bg'} {...props} />
+const WaveBoxBackground = (props) => {
+  return <AssetImage componentScope={'WavePreviewBox'} assetName={'previewbox-bg'} {...props} />;
 };
 
 export const WavePreviewBox = ({ x, y }) => {
@@ -14,7 +14,7 @@ export const WavePreviewBox = ({ x, y }) => {
       <WaveBoxBackground />
     </Group>
   );
-}
+};
 
 WavePreviewBox.propTypes = {
   x: PropTypes.number,

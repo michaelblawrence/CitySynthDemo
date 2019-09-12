@@ -25,7 +25,7 @@ export class SynthWindow extends Component {
 }
 
 function CloseWindowButton() {
-  const handleClick = (checked) => {
+  const handleClick = () => {
     getWasmModule();
   };
   return <ToggleIcon x={8} y={4} w={20} h={19} onClick={handleClick} />;

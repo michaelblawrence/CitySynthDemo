@@ -1,5 +1,5 @@
 import * as types from '../actionTypes';
-import { setParamValueFactory } from "./helper";
+import { setParamValueFactory } from './helper';
 
 export const setParamOscPhase = setParamValueFactory(types.SET_PARAM_OSC_PHASE);
 export const setParamOscWaveFunction = setParamValueFactory(types.SET_PARAM_OSC_WAVEFUNCTION);
