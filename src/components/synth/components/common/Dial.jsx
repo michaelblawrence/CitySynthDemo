@@ -1,10 +1,11 @@
+/* eslint-disable react/prop-types */
 import React, { Component, useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { Group, Ellipse } from 'react-konva';
 import { AssetImage } from '../features';
 import { HeaderText } from './HeaderText';
 import { rgbaToHexCode, clampNumber } from '../../../../common';
-import { store, observerSubscribe } from '../../../../store';
+import { ConnectHook } from '../common-core';
 
 const BackgroundImage = (props) => {
   const { ...other } = props;
@@ -33,7 +34,6 @@ const DialMarkerImage = (props) => {
 };
 DialMarkerImage.imgWidthPx = 39;
 DialMarkerImage.imgHeightPx = 39;
-
 DialMarkerImage.propTypes = {
   x: PropTypes.number,
   y: PropTypes.number,
@@ -52,13 +52,11 @@ function DialStandbyOverlay(props) {
     />
   );
 }
-
 DialStandbyOverlay.propTypes = {
   x: PropTypes.number,
   y: PropTypes.number,
   onClick: PropTypes.func,
 };
-
 DialStandbyOverlay.defaultProps = {
   x: 0,
   y: 0,
@@ -89,6 +87,7 @@ export class Dial extends Component {
     this.offsetY = 0;
 
     this.handleDragStart = this.handleDragStart.bind(this);
+    this.handleDragEnd = this.handleDragEnd.bind(this);
     this.handleDragMove = this.handleDragMove.bind(this);
   }
 
@@ -141,13 +140,26 @@ export class Dial extends Component {
     this.setState({ mouseDown: true, inactive: false });
   }
 
+  /**
+   * @param {{evt: DragEvent}} evt 
+   */
+  handleDragEnd() {
+    if (!this.state.mouseDown) {
+      return;
+    }
+    this.props.valueChanged
+      && clampNumber(this.state.value)
+      && this.props.valueChanged(this.state.value, true);
+    console.warn('fired mouse up evt');
+  }
+
   render() {
     const { x, y, hideBackground, noInactive } = this.props;
     const img_w = BackgroundImage.imgWidthPx;
     const bg_y = this.h - BackgroundImage.imgHeightPx;
     const rotation = clampNumber(this.state.value) * 274;
     return (
-      <Group x={x} y={y} onMouseDown={this.handleDragStart} onMouseMove={this.handleDragMove}>
+      <Group x={x} y={y} onMouseDown={this.handleDragStart} onMouseMove={this.handleDragMove} onMouseUp={this.handleDragEnd}>
         {hideBackground ? null : <BackgroundImage x={0} y={bg_y} />}
         <RoundDialImage x={0} y={bg_y} onMouseDown={this.handleDragStart} onMouseMove={this.handleDragMove} />
         <HeaderText
@@ -169,7 +181,6 @@ export class Dial extends Component {
     );
   }
 }
-
 Dial.propTypes = {
   value: PropTypes.number,
   valueChanged: PropTypes.func,
@@ -182,60 +193,69 @@ Dial.propTypes = {
   noInactive: PropTypes.bool,
   children: PropTypes.node.isRequired
 };
-
 Dial.defaultProps = {
   value: 0
+};
+export const ConnectLogDial = ({ hook, ...props }) => ConnectHook(hook)(({ value, valueChanged }) => {
+  const range = (hook && hook[2]) || [0, 1];
+  const [min, max] = range.map(bound => Math.log(bound));
+
+  const scaleFromUnit = value => (max - min) * value + min;
+  const scaleToUnit = value => (value - min) / (max - min);
+
+  const logValue = Math.log(value);
+  const _value = (hook && (value || value !== 0) && scaleToUnit(logValue)) || 0;
+  const _valueChanged = value => valueChanged(Math.exp(scaleFromUnit(value)));
+  
+  return <Dial {...props} value={_value} valueChanged={_valueChanged} />;
+});
+
+export const SnappyDial = ({segmentCount, ...props}) => {
+  const [state, setState] = useState(props.value);
+  useEffect(() => {
+    const snappedValue = Math.round(segmentCount * props.value) / segmentCount;
+    setState(snappedValue);
+  }, [props.value]);
+  const valueChanged = nextValue => {
+    const snappedValue = Math.round(segmentCount * nextValue) / segmentCount;
+    if (Math.abs(snappedValue - nextValue) > 0.05) {
+      setState(snappedValue);
+    }
+    if (typeof props.valueChanged === 'function'){
+      props.valueChanged(snappedValue);
+    }
+  };
+  return <Dial value={state} valueChanged={valueChanged} {...props} />;
 };
 
 export const ReduxDial = ({ store, action, ...others }) => {
   const handleValueChanged = (value) => store.dispatch(action(value));
   return <Dial {...others} valueChanged={handleValueChanged} />;
 };
-
 ReduxDial.propTypes = {
   store: PropTypes.object,
   action: PropTypes.func,
 };
 
-export const connectHook = (hook) => (componentCreator) => {
-  const range = (hook && hook[2]) || [0, 1];
+export const ConnectDial = ({ hook, ...props }) => ConnectHook(hook)(({ value, valueChanged }) => {
+  const [min, max] = (hook && hook[2]) || [0, 1];
+  
+  const scaleFromUnit = value => (max - min) * value + min;
+  const scaleToUnit = value => (value - min) / (max - min);
 
-  const scaleFromUnit = value => (range[1] - range[0]) * value + range[0];
-  const scaleToUnit = value => (value - range[0]) / (range[1] - range[0]);
+  const _value = (hook && (value || value !== 0) && scaleToUnit(value)) || 0;
+  const _valueChanged = value => valueChanged(scaleFromUnit(value));
 
-  const [state, setState] = useState(0.5);
-
-  useEffect(() => {
-    const unsubscribe = observerSubscribe((storage) => {
-      const { param } = mapStateToProps(storage);
-      setState(param);
-    });
-    return unsubscribe;
-  });
-
-  function mapStateToProps(state) {
-    const currValue = state && hook[0](state);
-    const param = hook && (currValue || currValue !== 0) && scaleToUnit(currValue);
-    return { param: param || 0 };
-  }
-  function mapDispatchToProps(value) {
-    const unit = scaleFromUnit(value);
-    return store.dispatch(hook[1](unit));
-  }
-  return componentCreator({
-    valueChanged: mapDispatchToProps,
-    value: state
-  });
-};
-
-export const ConnectDial = ({ hook, ...props }) => connectHook(hook)(
-  ({ value, valueChanged }) => (
-    <Dial {...props} value={value} valueChanged={valueChanged} />
-  )
-);
-
+  return <Dial {...props} value={_value} valueChanged={_valueChanged} />;
+});
 ConnectDial.propTypes = {
   hook: PropTypes.array,
 };
 
+export const ConnectSnappyDial = ({ hook, ...props }) => ConnectHook(hook)(({ value, valueChanged }) => (
+  <SnappyDial {...props} value={value} valueChanged={valueChanged} />
+));
+ConnectSnappyDial.propTypes = {
+  hook: PropTypes.array,
+};
 export default Dial;
