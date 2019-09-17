@@ -1,3 +1,5 @@
+export const EVENT_KEY_DOWN              = 'EVENT_KEY_DOWN';
+export const EVENT_KEY_UP                = 'EVENT_KEY_UP';
 export const SET_ALL_PARAMS              = 'SET_ALL_PARAMS';
 
 export const SET_PARAM_AMP_ATTACK        = 'SET_PARAM_AMP_ATTACK';
@@ -13,6 +15,8 @@ export const SET_PARAM_OSC_GAIN          = 'SET_PARAM_OSC_GAIN';
 
 export const SET_PARAM_DELAY_LENGTH      = 'SET_PARAM_DELAY_LENGTH';
 export const SET_PARAM_DELAY_WET         = 'SET_PARAM_DELAY_WET';
+
+export const SET_PARAM_REVERB_LENGTH     = 'SET_PARAM_REVERB_LENGTH';
 
 export const SET_PARAM_PITCH_LFO_RATE    = 'SET_PARAM_PITCH_LFO_RATE';
 export const SET_PARAM_PITCH_LFO_WIDTH   = 'SET_PARAM_PITCH_LFO_WIDTH';

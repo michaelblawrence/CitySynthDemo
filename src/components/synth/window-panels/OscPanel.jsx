@@ -2,7 +2,7 @@ import React from 'react';
 import { Group } from 'react-konva';
 
 import { HeaderText, PanelDivider, WavePreviewBox, ReduxDial, ConnectDial } from '../components';
-import { setParamDelayLength, setParamDelayWetAmt, setParamOscPhase, setParamOscWaveFunction, setParamOscGain } from '../../../redux/actions/OscActions';
+import { setParamDelayLength, setParamDelayWetAmt, setParamOscPhase, setParamOscWaveFunction, setParamOscGain, setParamReverbWetAmt } from '../../../redux/actions/OscActions';
 import store from '../../../store';
 import { createStoreHook } from '../../../redux/actions/helper';
 import { Param } from '../../../redux/types';
@@ -24,7 +24,6 @@ const OscPanel = () => {
   );
 };
 
-// const OscPhaseHook = createStoreHook(Param., setParamDelayLength, [0, 1]);
 const DelayWetAmountHook = createStoreHook(Param.DelayWet, setParamDelayWetAmt, [0, 1.1 * 100]);
 
 const DelayPanel = () => {
@@ -38,12 +37,26 @@ const DelayPanel = () => {
   );
 };
 
+const ReverbWetAmountHook = createStoreHook(Param.ReverbWet, setParamReverbWetAmt, [0, 1.1 * 100]);
+
+const ReverbPanel = () => {
+  return (
+    <Group>
+      <HeaderText x={355} y={97} width={57} centered>REVERB</HeaderText>
+
+      <ReduxDial x={355} y={123} h={68} store={store} action={setParamDelayLength}>Length</ReduxDial>
+      <ConnectDial x={355} y={200} h={68} hook={ReverbWetAmountHook}>Dry/Wet</ConnectDial>
+    </Group>
+  );
+};
+
 export const OscGroupPanel = () => {
+  const enableTouchActive = true;
   return (
     <Group>
       <OscPanel />
       <PanelDivider x={331} y={110} />
-      <DelayPanel />
+      {enableTouchActive ? <ReverbPanel /> : <DelayPanel />}
     </Group>
   );
 };

@@ -91,6 +91,8 @@ function OscReducer(action, state) {
       return getParamSetter(state, action, Param.WFunction);
     case types.SET_PARAM_DELAY_WET:
       return getParamSetter(state, action, Param.DelayWet);
+    case types.SET_PARAM_REVERB_LENGTH:
+      return getParamSetter(state, action, Param.ReverbWet);
     default:
       return state;
   }

@@ -195,33 +195,37 @@ export const Keys = {
   Alt: 262144
 };
 
+export function altKeyPressed(keyCode) {
+  return keyCode === (Keys.RButton | Keys.ShiftKey);
+}
+
 /**
 * @param {number} keyCode
 */
 export function validateKeyCode(keyCode) {
   switch (keyCode) {
   //Keyboard Keys
-  case Keys.Q:
-  case Keys.A:
-  case Keys.W:
-  case Keys.S:
-  case Keys.E:
-  case Keys.D:
-  case Keys.F:
-  case Keys.T:
-  case Keys.G:
-  case Keys.Y:
-  case Keys.H:
-  case Keys.U:
-  case Keys.J:
-  case Keys.K:
-  case Keys.O:
-  case Keys.L:
-  case Keys.P:
-  case Keys.OemSemicolon:
-  case Keys.Oemtilde:
-    return true;
-  default:
-    return false;
+    case Keys.Q:
+    case Keys.A:
+    case Keys.W:
+    case Keys.S:
+    case Keys.E:
+    case Keys.D:
+    case Keys.F:
+    case Keys.T:
+    case Keys.G:
+    case Keys.Y:
+    case Keys.H:
+    case Keys.U:
+    case Keys.J:
+    case Keys.K:
+    case Keys.O:
+    case Keys.L:
+    case Keys.P:
+    case Keys.OemSemicolon:
+    case Keys.Oemtilde:
+      return true;
+    default:
+      return false;
   }
 }

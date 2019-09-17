@@ -1,3 +1,4 @@
+// @ts-check
 import * as types from '../actionTypes';
 import { setParamValueFactory } from './helper';
 
@@ -7,3 +8,5 @@ export const setParamOscGain = setParamValueFactory(types.SET_PARAM_OSC_GAIN);
 
 export const setParamDelayLength = setParamValueFactory(types.SET_PARAM_DELAY_LENGTH);
 export const setParamDelayWetAmt = setParamValueFactory(types.SET_PARAM_DELAY_WET);
+
+export const setParamReverbWetAmt = setParamValueFactory(types.SET_PARAM_REVERB_LENGTH);

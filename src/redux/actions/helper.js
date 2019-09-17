@@ -10,9 +10,16 @@ export const setParamValueFactory = (actionType) => {
 };
 
 export const setAllParamsActionFactory = (actionType) => {
-  return dump => ({
+  return data => ({
     type: actionType,
-    payload: dump
+    payload: data
+  });
+};
+
+export const userEventActionFactory = (actionType) => {
+  return payload => ({
+    type: actionType,
+    payload
   });
 };
 

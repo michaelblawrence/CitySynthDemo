@@ -1,5 +1,6 @@
 //@ts-check
 import React from 'react';
+import PropTypes from 'prop-types';
 import { Image } from 'react-konva';
 import useImage from 'use-image';
 
@@ -12,7 +13,7 @@ import useImage from 'use-image';
  *  onInfoReady: (imgInfo: {w: number, h: number}) => void
  * }} props
  */
-export function AssetImage(props) {
+export const AssetImage = (props) => {
   const { componentScope, assetName, assetExt, resDirector, onInfoReady, ...others } = props;
   const ext = (typeof assetExt === 'string' && assetExt) || 'png';
   const dir = (typeof resDirector === 'string' && resDirector) || 'synth';
@@ -33,6 +34,14 @@ export function AssetImage(props) {
   }
 
   return <Image image={image} ref={imageRef} {...others} />;
+};
+
+AssetImage.propTypes = {
+  componentScope: PropTypes.string,
+  assetName: PropTypes.string,
+  assetExt: PropTypes.string,
+  resDirector: PropTypes.string,
+  onInfoReady: PropTypes.func
 };
 
 /**
