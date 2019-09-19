@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import { AssetImage } from '../features';
 import { HeaderText } from './HeaderText';
 import { Group } from 'react-konva';
+import { ConnectHook } from '../common-core';
 
 const ToggleImage = (props) => {
   const { on, ...other } = props;
@@ -29,7 +30,7 @@ export class ToggleIcon extends Component {
   };
 
   /**
-   * @param {{w: number, h: number, text?: string, onClick: (checked: boolean) => void, children: React.ReactNode}} props
+   * @param {{w: number, h: number, text?: string, checked: boolean, onClick: (checked: boolean) => void, children: React.ReactNode}} props
    */
   constructor(props) {
     super(props);
@@ -38,6 +39,7 @@ export class ToggleIcon extends Component {
 
     this.w = this.props.w;
     this.h = this.props.h;
+    this.state.checked = props.checked;
     this.state.text = typeof (props.text) === 'string'
       ? props.text
       : (typeof props.children === 'string' && props.children) || this.state.text;
@@ -48,6 +50,16 @@ export class ToggleIcon extends Component {
       w: ToggleImage.imgWidthPx,
       h: ToggleImage.imgHeightPx,
     });
+  }
+
+  componentDidUpdate() {
+    const { checked } = this.props;
+    if (typeof checked === 'undefined') {
+      return;
+    }
+    if (this.state.checked !== checked) {
+      this.handleClick();
+    }
   }
 
   /**
@@ -109,6 +121,7 @@ ToggleIcon.propTypes = {
   y: PropTypes.number,
   text: PropTypes.string,
   enabled: PropTypes.bool,
+  checked: PropTypes.bool,
   onClick: PropTypes.func,
   children: PropTypes.node.isRequired
 };
@@ -119,4 +132,15 @@ ToggleIcon.defaultProps = {
   x: 0,
   y: 0,
   enabled: true,
+  checked: undefined,
+};
+
+export const ConnectToggle = ({ hook, ...props }) => ConnectHook(hook)(({ value, valueChanged }) => {
+  const _value = (hook && (value || value !== 0) && value > 0.5) || false;
+  const _valueChanged = checked => valueChanged(+checked);
+
+  return <ToggleIcon {...props} checked={_value} onClick={_valueChanged} />;
+});
+ConnectToggle.propTypes = {
+  hook: PropTypes.array,
 };

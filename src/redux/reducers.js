@@ -50,6 +50,8 @@ function AmpEnvReducer(action, state) {
 
 function FilterEnvReducer(action, state) {
   switch (action.type) {
+    case types.SET_ENABLE_FILTER_EG:
+      return getParamSetter(state, action, Param.LPFenvelope);
     case types.SET_PARAM_FILTER_EG_ATTACK:
       return getParamSetter(state, action, Param.LPFattack);
     case types.SET_PARAM_FILTER_EG_RELEASE:
