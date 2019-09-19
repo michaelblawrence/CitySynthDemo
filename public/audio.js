@@ -108,7 +108,7 @@ function setParam(data) {
      */
   const synth = globalThis.synth;
   if (synth && typeof paramIden !== 'undefined' && typeof value === 'number') {
-    console.log(`synth.set_state(paramIden = ${paramIden}, value = ${value});`);
+    // console.log(`synth.set_state(paramIden = ${paramIden}, value = ${value});`);
     synth.set_state(paramIden, value);
   }
 }
