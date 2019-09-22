@@ -100,16 +100,16 @@ const PresetSelectorDropdown = ({ visible, onChangePreset, selectedIndex: selIdx
         >
           {item}
         </HeaderText>,
-        <Line
+        (idx < length - 1) && (<Line
           points={[
             13,
-            6 + bg_h + listItemHeight * (idx + 1),
-            listItemWidth + 13,
-            6 + bg_h + listItemHeight * (idx + 1)
+            6.4 + bg_h + listItemHeight * (idx + 1),
+            listItemWidth + 25,
+            6.4 + bg_h + listItemHeight * (idx + 1)
           ]}
           stroke={'#19191980'}
           strokeWidth={1}
-          key={item + idx + 'l'} />
+          key={item + idx + 'l'} />)
       ]
     ));
 

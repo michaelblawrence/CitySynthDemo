@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Group } from 'react-konva';
 
-import { HeaderText, PanelDivider, WavePreviewBox, ReduxDial, ConnectDial } from '../components';
+import { HeaderText, PanelDivider, WavePreviewBox, ReduxDial, ConnectDial, ToggleIcon } from '../components';
 import { setParamDelayLength, setParamDelayWetAmt, setParamOscPhase, setParamOscWaveFunction, setParamOscGain, setParamReverbWetAmt } from '../../../redux/actions/OscActions';
 import store from '../../../store';
 import { createStoreHook } from '../../../redux/actions/helper';
@@ -51,12 +51,15 @@ const ReverbPanel = () => {
 };
 
 export const OscGroupPanel = () => {
-  const enableTouchActive = true;
+  const [enableTouchActive, setTouchAcvtiveEnabled] = useState(true);
+  const switchPanels = (checked) => setTouchAcvtiveEnabled(checked);
+
   return (
     <Group>
       <OscPanel />
       <PanelDivider x={331} y={110} />
       {enableTouchActive ? <ReverbPanel /> : <DelayPanel />}
+      <ToggleIcon x={406} y={89} w={28} h={24} checked={enableTouchActive} onClick={switchPanels} />
     </Group>
   );
 };
