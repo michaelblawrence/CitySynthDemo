@@ -7,8 +7,8 @@ const App = () => {
     <div className="App">
       <Header resumeData={resumeData} />
       <SynthWindow />
-      <About resumeData={resumeData} />
-      <Resume resumeData={resumeData} />
+      <About resumeData={resumeData} iden="about" />
+      <About resumeData={resumeData} iden="tech" />
       <Portfolio resumeData={resumeData} />
       {/* <Testimonials resumeData={resumeData}/> */}
       {/* <ContactUs resumeData={resumeData}/> */}

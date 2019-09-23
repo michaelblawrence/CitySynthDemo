@@ -6,7 +6,7 @@ import { Group } from 'react-konva';
 
 export const SynthWindow = () => {
   return (
-    <section id="about">
+    <section id="demo">
       <div className="row">
         <BaseWindow>
           <OscGroupPanel />
