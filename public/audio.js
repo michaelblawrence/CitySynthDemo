@@ -7,9 +7,24 @@
  */
 class CityRustGenerator extends AudioWorkletProcessor {
   constructor() {
+    // @ts-check
     super();
-    this.port.onmessage = handleMessage.bind(this);
+    /** 
+     * @type {{port: MessagePort}}
+     */
+    const {port} = this;
+    port.onmessage = handleMessage.bind(this);
+    port.onmessageerror = (err) => console.error(err);
+
     this.buffer = null;
+    this.uiWaveformViewLength = 128;
+    this.uiWaveformView = {
+      buffer: new Float32Array(this.uiWaveformViewLength),
+      sampleRate: 48000 / 20,
+      counter: 0,
+      shouldSend: (nSamples) => (this.uiWaveformView.counter += nSamples) >= this.uiWaveformView.sampleRate,
+      post: () => { sendWaveformData(this.uiWaveformView.buffer, port); this.uiWaveformView.counter = 0; },
+    };
   }
 
   process(_, outputs) {
@@ -18,10 +33,17 @@ class CityRustGenerator extends AudioWorkletProcessor {
     for (let channel = 0; channel < output.length; ++channel) {
       if (globalThis.synth) {
         /**
-                 * @type CitySynth
-                 */
+         * @type CitySynth
+         */
         const synth = globalThis.synth;
         synth.read(output[channel]);
+
+        if (this.uiWaveformView.shouldSend(output[channel].length)) {
+          output[channel]
+            .slice(0, this.uiWaveformViewLength)
+            .forEach((sample, idx) => this.uiWaveformView.buffer[idx] = sample);
+          this.uiWaveformView.post();
+        }
       }
     }
 
@@ -128,18 +150,27 @@ function getParam(data, port) {
   }
 }
 
+/**
+ * 
+ * @param {Float32Array} samples 
+ * @param {MessagePort} port 
+ */
+function sendWaveformData(samples, port) {
+  port.postMessage({ type: 'WAVEFORM_PUSH', samples: [...samples] });
+}
+
 function dumpAllParam(data, port) {
   const { dumpAll } = data;
   const paramIdens = Object.keys(Param)
-    .map(param => ({param: param, paramIden: Param[param]}));
+    .map(param => ({ param: param, paramIden: Param[param] }));
 
   /**
      * @type CitySynth
      */
   const synth = globalThis.synth;
   if (synth && dumpAll === true) {
-    const values = paramIdens.map(item => ({...item, value: synth.get_state(item.paramIden)}));
-    const dump = values.reduce((dict, kvp) => ({...dict, [kvp.param]: kvp.value}), {});
+    const values = paramIdens.map(item => ({ ...item, value: synth.get_state(item.paramIden) }));
+    const dump = values.reduce((dict, kvp) => ({ ...dict, [kvp.param]: kvp.value }), {});
     port.postMessage({ type: 'DUMP_PARAMS_CALLBACK', dump });
     return dump;
   }

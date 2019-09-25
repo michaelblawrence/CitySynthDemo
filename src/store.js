@@ -19,7 +19,7 @@ const epicMiddleware = createEpicMiddleware();
  */
 const handleTouchEnable = ev => {
   if (altKeyPressed(ev.payload.keyCode)) {
-    store.dispatch();
+    // store.dispatch();
   }
 };
 
@@ -77,6 +77,8 @@ export function observerSubscribe(callback) {
   const actionSub = replayStore$.subscribe(state => callback(state));
   return () => actionSub.unsubscribe();
 }
+
+export { waveform$ } from './workerActions';
 
 export default store;
 

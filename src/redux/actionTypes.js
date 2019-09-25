@@ -1,6 +1,8 @@
 export const EVENT_KEY_DOWN              = 'EVENT_KEY_DOWN';
 export const EVENT_KEY_UP                = 'EVENT_KEY_UP';
 export const SET_ALL_PARAMS              = 'SET_ALL_PARAMS';
+export const ALT_KEY_PRESSED             = 'ALT_KEY_PRESSED';
+export const ALT_KEY_RELEASED            = 'ALT_KEY_RELEASED';
 
 export const SET_PARAM_AMP_ATTACK        = 'SET_PARAM_AMP_ATTACK';
 export const SET_PARAM_AMP_DECAY         = 'SET_PARAM_AMP_DECAY';

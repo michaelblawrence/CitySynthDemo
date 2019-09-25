@@ -4,11 +4,25 @@ import { InversedParam } from './redux/types';
 import { setAllParams, keyDownEvent, keyUpEvent } from './redux/actions/MetaActions';
 import { validateKeyCode, altKeyPressed } from './common/DataExtensions/MidiDataExtensions';
 import { store } from './store';
+// eslint-disable-next-line no-unused-vars
+import { Observable, ReplaySubject, Subscription } from 'rxjs';
+import { filter, take, map, shareReplay } from 'rxjs/operators';
 
 /**
- * @type {{hasStarted: boolean, synthNode: AudioWorkletNode}}
+ * @type {{ 
+ *  hasStarted: boolean, 
+ *  synthNode: AudioWorkletNode, 
+ *  synthNodePort$: Observable<any>, 
+ *  synthWaveformSubscription: Subscription
+ * }}
  */
-export const initState = { hasStarted: false, synthNode: null };
+export const initState = {
+  hasStarted: false,
+  synthNode: null,
+  synthNodePort$: null,
+  synthWaveformSubscription: null
+};
+//could await this
 
 const presetPromptChar = '.';
 
@@ -49,6 +63,9 @@ async function getModule() {
 }
 
 export async function getWasmModule() {
+  if (initState.synthNode) {
+    return;
+  }
   const actx = new (window.AudioContext || window['webkitAudioContext'])();
   await actx.audioWorklet.addModule('audio.js');
   const module = await getModule();
@@ -56,8 +73,35 @@ export async function getWasmModule() {
   postWorkerAction(synthNode, WorkerActionFactory.sendModule(module));
   synthNode.connect(actx.destination);
   initState.synthNode = synthNode;
-  syncParamsState();
+  const port$ = new Observable((subscriber) => {
+    synthNode.port.onmessage = (ev) => {
+      subscriber.next({ message: ev, error: null });
+    };
+
+    synthNode.port.onmessageerror = (ev) => {
+      subscriber.next({ error: ev, message: null });
+    };
+
+    return () => {
+      synthNode.port.onmessage = null;
+      synthNode.port.onmessageerror = null;
+    };
+  }).pipe(
+    shareReplay()
+  );
+  initState.synthWaveformSubscription = port$.pipe(
+    filter(({message}) => message.data.type === 'WAVEFORM_PUSH'),
+    map(({message}) => message.data.samples),
+  ).subscribe(samples => waveformSubject.next(samples));
+  initState.synthNodePort$ = port$.pipe(
+    filter(next => next.error === null),
+    map(next => next.message)
+  );
+  await syncParamsState();
 }
+
+const waveformSubject = new ReplaySubject(1);
+export const waveform$ = waveformSubject.pipe(shareReplay());
 
 export async function getParamValue(paramIden) {
   return await new Promise((resolve, reject) => {
@@ -89,21 +133,21 @@ export async function getParamValue(paramIden) {
 async function getAllParamValues() {
   return await new Promise((resolve, reject) => {
     try {
-      /**
-       * @type {{synthNode: AudioWorkletNode}}
-       */
-      const { synthNode } = initState;
+      const { synthNode, synthNodePort$ } = initState;
       if (synthNode) {
         /**
          * @param {MessageEvent} evt
          */
-        synthNode.port.onmessage = evt => {
+        synthNodePort$.pipe(
+          filter(evt => evt.data.type === 'DUMP_PARAMS_CALLBACK'),
+          filter(evt => typeof evt.data.dump !== 'undefined'),
+          take(1)
+        ).subscribe(evt => {
           const { data } = evt;
           if (typeof data !== 'undefined' && data.type === 'DUMP_PARAMS_CALLBACK' && typeof data.dump !== 'undefined') {
-            synthNode.port.onmessage = null;
             resolve(data.dump);
           }
-        };
+        });
         postWorkerAction(synthNode, WorkerActionFactory.dumpState());
       }
     }

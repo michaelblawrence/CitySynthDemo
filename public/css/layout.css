@@ -171,7 +171,7 @@ header .scrolldown a.try-msg {
    margin-left: -100px;
    bottom: -18px;
    /* position: relative; */
- }
+}
 
 header .scrolldown a:hover {
    color: #11ABB0;
@@ -268,6 +268,46 @@ ul#nav li.current a {
 
 #about a:hover, #about a:focus, #tech a:hover, #tech a:focus {
    color: #11ABB0;
+}
+
+#demo h2.feature-header {
+   text-align: center;
+   color: #ffffff;
+   text-transform: uppercase;
+   margin-bottom: 32px;
+   padding-top: 22px;
+   font-size: 22px;
+   text-shadow: 1px 1px 1px black;
+}
+
+#demo .overlay {
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   position: absolute;
+   top: 0px;
+   margin: 0 auto;
+   background: #00000048;
+   transition: 100ms ease background;
+}
+
+#demo .overlay:hover {
+   background: #5e28b400;
+}
+
+#demo .overlay .loading-text {
+   text-transform: uppercase;
+   color: #ffffff99;
+   text-shadow: 2px 2px 1px black;
+   font-size: 50px;
+   font-weight: 700;
+   padding-top: 15px;
+}
+
+.row--synth {
+   position: relative;
+   width: 925px;
+   margin: 0 auto;
 }
 
 #about h2, #tech h2 {
