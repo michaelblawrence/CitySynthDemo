@@ -34,7 +34,7 @@ export const WavePreviewBox = ({ x, y }) => {
   return (
     <Group x={x} y={y}>
       <WaveBoxBackground />
-      <Line points={points} strokeWidth={1.5} stroke={'#FFFFA5FF'} />
+      <Line points={points} strokeWidth={1.5} stroke={'#ffa500'} />
     </Group>
   );
 };

@@ -704,11 +704,16 @@ ul#nav li.current a {
    color: #ffffff;
    opacity: 0;
    text-shadow: 2px 2px 2px black;
+   cursor: pointer;
    transition: opacity 0.1s ease-in-out;
 }
 
 .overlay:hover i.fa.fa-play {
    opacity: 0.72;
+}
+
+.overlay i.fa.fa-play:hover {
+   opacity: 1;
 }
 
 .portfolio-item .item-wrap .link-icon {
