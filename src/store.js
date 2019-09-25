@@ -10,7 +10,7 @@ import { rootReducer } from './redux/reducers';
 import { Param } from './redux/types';
 import { initState, publishParam } from './workerActions';
 import { EVENT_KEY_UP, EVENT_KEY_DOWN } from './redux/actionTypes';
-import { altKeyPressed } from './common/DataExtensions/MidiDataExtensions';
+import { altKeyPressed } from './common/DataExtensions';
 
 const epicMiddleware = createEpicMiddleware();
 
@@ -19,7 +19,7 @@ const epicMiddleware = createEpicMiddleware();
  */
 const handleTouchEnable = ev => {
   if (altKeyPressed(ev.payload.keyCode)) {
-    // store.dispatch();
+    // store.dispatch(ALT_KEY_PRESSED);
   }
 };
 

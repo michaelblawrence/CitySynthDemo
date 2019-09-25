@@ -321,6 +321,10 @@ ul#nav li.current a {
    color: #7A7A7A;
 }
 
+#about p.address span {
+   display: block;
+}
+
 #about .profile-pic {
    position: relative;
    width: 120px;
@@ -672,6 +676,39 @@ ul#nav li.current a {
    -o-transition: opacity 0.3s ease-in-out;
    transition: opacity 0.3s ease-in-out;
    background: url(../images/overlay-bg.png) repeat;
+}
+
+.blur-animation {
+   animation: blur 0.75s ease 0s infinite;
+   -webkit-animation: blur 0.75s ease 0s infinite;
+   -moz-animation: blur 0.75s ease 0s infinite;
+}
+
+@keyframes blur {
+   0%, 90% {
+      -webkit-filter: blur(0px);
+      -moz-filter: blur(0px);
+      -o-filter: blur(0px);
+      -ms-filter: blur(0px);
+   }
+   50% {
+      -webkit-filter: blur(4px);
+      -moz-filter: blur(4px);
+      -o-filter: blur(4px);
+      -ms-filter: blur(4px);
+   }
+}
+
+.overlay i {
+   font-size: 120px;
+   color: #ffffff;
+   opacity: 0;
+   text-shadow: 2px 2px 2px black;
+   transition: opacity 0.1s ease-in-out;
+}
+
+.overlay:hover i.fa.fa-play {
+   opacity: 0.72;
 }
 
 .portfolio-item .item-wrap .link-icon {

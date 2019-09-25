@@ -1,5 +1,5 @@
 import React from 'react';
-import { SynthWindow, Header, About, Resume, Footer, Portfolio } from './components';
+import { SynthWindow, Header, Footer, Portfolio, ProductAbout, TechStackAbout } from './components';
 import resumeData from './resumeData';
 
 const App = () => {
@@ -7,8 +7,8 @@ const App = () => {
     <div className="App">
       <Header resumeData={resumeData} />
       <SynthWindow />
-      <About resumeData={resumeData} iden="about" />
-      <About resumeData={resumeData} iden="tech" />
+      <ProductAbout resumeData={resumeData}/>
+      <TechStackAbout resumeData={resumeData} />
       <Portfolio resumeData={resumeData} />
       {/* <Testimonials resumeData={resumeData}/> */}
       {/* <ContactUs resumeData={resumeData}/> */}

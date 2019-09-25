@@ -1,19 +1,53 @@
 /* eslint-disable react/prop-types */
 import React, { Component } from 'react';
-export class About extends Component {
+export class ProductAbout extends Component {
   render() {
     let resumeData = this.props.resumeData;
     return (
-      <section id={this.props.iden || 'about'}>
+      <section id={'about'}>
         <div className="row">
 
-          <div className="six columns">
+          <div className="four columns">
 
-            <img className="profile-pic" src="images/profilepic.jpg" alt="" />
+            {/* <img className="profile-pic" src="images/profilepic.jpg" alt="" /> */}
 
           </div>
 
-          <div className="six columns main-col">
+          <div className="eight columns main-col">
+
+            <h2>CitySynth</h2>
+            <p>
+              {
+                resumeData.productAbout
+              }
+            </p>
+
+            <div className="row">
+
+              <div className="columns contact-details">
+
+                <h2>Features</h2>
+                <p className="address">
+                  <span>{resumeData.name}</span>
+                  <span>{resumeData.address}</span>
+                  <span>{resumeData.website}</span>
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    );
+  }
+}
+export class TechStackAbout extends Component {
+  render() {
+    let resumeData = this.props.resumeData;
+    return (
+      <section id={'tech'}>
+        <div className="row">
+
+          <div className="eight columns main-col">
 
             <h2>About Me</h2>
             <p>
@@ -38,6 +72,12 @@ export class About extends Component {
                 </p>
               </div>
             </div>
+          </div>
+
+          <div className="four columns">
+
+            {/* <img className="profile-pic" src="images/profilepic.jpg" alt="" /> */}
+
           </div>
         </div>
       </section>

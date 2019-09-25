@@ -2,7 +2,7 @@
 
 import { InversedParam } from './redux/types';
 import { setAllParams, keyDownEvent, keyUpEvent } from './redux/actions/MetaActions';
-import { validateKeyCode, altKeyPressed } from './common/DataExtensions/MidiDataExtensions';
+import { validateKeyCode, altKeyPressed } from './common/DataExtensions';
 import { store } from './store';
 // eslint-disable-next-line no-unused-vars
 import { Observable, ReplaySubject, Subscription } from 'rxjs';

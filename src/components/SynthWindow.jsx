@@ -4,6 +4,7 @@ import { BaseWindow, ToggleIcon, PresetSelector } from './synth';
 import { OscGroupPanel, EnvGroupPanel, MasterGroupPanel, PitchGroupPanel, FilterTouchGroupPanel, AmpEnvGroupPanel } from './synth/window-panels';
 import { getWasmModule } from '../workerActions';
 import { Group } from 'react-konva';
+import { classNames } from '../common';
 
 export const SynthWindow = () => {
   const [showOverlay, setOverlayVisible] = useState(true);
@@ -16,13 +17,13 @@ export const SynthWindow = () => {
       setIsLoading(false);
     });
   };
-  
+
   return (
     <section id="demo">
       <div className="row">
         <h2 className="feature-header">Try the Live Beta in you browser!</h2>
       </div>
-      <div className="row row--synth">
+      <div className={classNames({'row': true, 'row--synth': true, 'blur-animation': showLoading})}>
         <BaseWindow>
           <OscGroupPanel />
           <EnvGroupPanel />
@@ -60,9 +61,9 @@ const WindowCaptionArea = () => {
 
 const InitialWindowOverlay = ({ hideOverlay, isLoading }) => {
   return (
-    <div className="overlay" style={{ width: 925, height: 528 }} onClick={hideOverlay}>
-      {isLoading &&
-        <span className="loading-text">Loading...</span>
+    <div className='overlay' style={{ width: 925, height: 528 }} onClick={hideOverlay}>
+      {!isLoading &&
+        <i className="fa fa-play"></i>
       }
     </div>
   );

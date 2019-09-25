@@ -1,4 +1,4 @@
-export const Keys = {
+const Keys = {
   Modifiers: -65536,
   None: 0,
   LButton: 1,

@@ -15,6 +15,7 @@ let resumeData = {
       'className': 'fa fa-github'
     }
   ],
+  'productAbout': 'CitySynth offers both modulating algorithmic reverb and delay, buttery filters and a per-oscillator analogue-style end stage. Complete with over 100 factory presets, you\'ll be surprised by the range of possibilities. Complete with musical PC keyboard support and (soon) MIDI support, CitySynth is a tool for the studio and on the go!',
   'aboutme': 'I am currently a pre-final year student at The LNM Institute of Information Technology and pursuing my B.Tech from here. I am a self taught Full Stack Web Developer, currently diving deeper into Machine Learning. I believe that to be successful in life, one needs to be obsessive with their dreams and keep working towards them.',
   'address': 'London',
   'website': 'https://michaelblawrence.github.io/rustwasmtester/react/',
