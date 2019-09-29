@@ -1,0 +1,27 @@
+/* tslint:disable */
+export const memory: WebAssembly.Memory;
+export function __wbg_universe_free(a: number): void;
+export function universe_new(): number;
+export function universe_width(a: number): number;
+export function universe_height(a: number): number;
+export function universe_set_size(a: number, b: number, c: number): void;
+export function universe_cells(a: number): number;
+export function universe_reset(a: number): void;
+export function universe_clear(a: number): void;
+export function universe_toggle(a: number, b: number, c: number): void;
+export function universe_tick(a: number): void;
+export function __wbindgen_global_argument_ptr(): number;
+export function __wbg_citysynth_free(a: number): void;
+export function citysynth_new(a: number, b: number, c: number): number;
+export function citysynth_read(a: number, b: number, c: number): void;
+export function citysynth_set_buffer_len(a: number, b: number): void;
+export function citysynth_note_on(a: number, b: number, c: number, d: number): void;
+export function citysynth_note_off(a: number, b: number): void;
+export function citysynth_set_freq(a: number, b: number): number;
+export function citysynth_get_state(a: number, b: number): number;
+export function citysynth_set_state(a: number, b: number, c: number): number;
+export function citysynth_refresh(a: number): void;
+export function citysynth_print(a: number, b: number, c: number, d: number): void;
+export function citysynth_load_preset(a: number, b: number, c: number, d: number): void;
+export function __wbindgen_malloc(a: number): number;
+export function __wbindgen_free(a: number, b: number): void;
