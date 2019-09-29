@@ -51,8 +51,8 @@ const ReverbPanel = () => {
 };
 
 export const OscGroupPanel = () => {
-  const [enableTouchActive, setTouchAcvtiveEnabled] = useState(true);
-  const switchPanels = (checked) => setTouchAcvtiveEnabled(checked);
+  const [enableTouchActive, setTouchActiveEnabled] = useState(true);
+  const switchPanels = (checked) => setTouchActiveEnabled(checked);
 
   return (
     <Group>

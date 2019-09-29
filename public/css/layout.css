@@ -257,8 +257,8 @@ ul#nav li.current a {
 
 #about, #demo, #tech {
    background: #2B2B2B;
-   padding-top: 96px;
-   padding-bottom: 66px;
+   padding-top: 65px;
+   padding-bottom: 50px;
    overflow: hidden;
 }
 
@@ -268,6 +268,14 @@ ul#nav li.current a {
 
 #about a:hover, #about a:focus, #tech a:hover, #tech a:focus {
    color: #11ABB0;
+}
+
+#tech {
+   background: #0a0a0a;
+}
+
+#about {
+   background: #16191d;
 }
 
 #demo h2.feature-header {
@@ -287,7 +295,7 @@ ul#nav li.current a {
    position: absolute;
    top: 0px;
    margin: 0 auto;
-   background: #00000048;
+   background: #00000020;
    transition: 100ms ease background;
 }
 
@@ -318,7 +326,25 @@ ul#nav li.current a {
 
 #about p, #demo p {
    line-height: 30px;
-   color: #7A7A7A;
+   color: #AAAAAA;
+}
+
+#tech .tech-logo-header {
+   color: #545454;
+   font-size: 16px;
+   font-weight: normal;
+   font-family: sans-serif;
+   letter-spacing: 0.2em;
+   text-transform: uppercase;
+}
+
+.tech-logo--container {
+   height: 100%;
+   padding: 40px 0px;
+}
+
+#about .features span {
+   display: block;
 }
 
 #about p.address span {
@@ -645,9 +671,11 @@ ul#nav li.current a {
 }
 
 .portfolio-item .item-wrap {
-   background: #fff;
+   background: #212121;
    overflow: hidden;
    position: relative;
+   display: flex;
+   box-shadow: 0px 3px 4px #0000006b;
    -webkit-transition: all 0.3s ease-in-out;
    -moz-transition: all 0.3s ease-in-out;
    -o-transition: all 0.3s ease-in-out;
@@ -655,9 +683,21 @@ ul#nav li.current a {
    transition: all 0.3s ease-in-out;
 }
 
+.portfolio-item {
+   height: 182px;
+   display: flex;
+   margin: 0 25px;
+}
+
+#portfolio-wrapper {
+   display: flex;
+   justify-content: center;
+ }
+
 .portfolio-item .item-wrap a {
    display: block;
    cursor: pointer;
+   margin: auto;
 }
 
 /* overlay */
@@ -692,10 +732,10 @@ ul#nav li.current a {
       -ms-filter: blur(0px);
    }
    50% {
-      -webkit-filter: blur(4px);
-      -moz-filter: blur(4px);
-      -o-filter: blur(4px);
-      -ms-filter: blur(4px);
+      -webkit-filter: blur(3px);
+      -moz-filter: blur(3px);
+      -o-filter: blur(3px);
+      -ms-filter: blur(3px);
    }
 }
 

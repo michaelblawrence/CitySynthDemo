@@ -9,7 +9,7 @@ export class ProductAbout extends Component {
 
           <div className="four columns">
 
-            {/* <img className="profile-pic" src="images/profilepic.jpg" alt="" /> */}
+            <img className="tech-logo" src="images/cropped-osc-panel1.png" alt="CitySynth in action" />
 
           </div>
 
@@ -24,13 +24,12 @@ export class ProductAbout extends Component {
 
             <div className="row">
 
-              <div className="columns contact-details">
+              <div className="eight columns product-details">
 
                 <h2>Features</h2>
-                <p className="address">
-                  <span>{resumeData.name}</span>
-                  <span>{resumeData.address}</span>
-                  <span>{resumeData.website}</span>
+                <p className="features">
+                  {resumeData.productFeatures.map(entry => (
+                    <span key={entry}>{entry}</span>))}
                 </p>
               </div>
             </div>
@@ -49,7 +48,7 @@ export class TechStackAbout extends Component {
 
           <div className="eight columns main-col">
 
-            <h2>About Me</h2>
+            <h2>How it works</h2>
             <p>
               {
                 resumeData.aboutme
@@ -75,9 +74,10 @@ export class TechStackAbout extends Component {
           </div>
 
           <div className="four columns">
-
-            {/* <img className="profile-pic" src="images/profilepic.jpg" alt="" /> */}
-
+            <div className="tech-logo--container">
+              <h3 className="tech-logo-header">Powered by:</h3>
+              <img className="tech-logo" src="images/webassembly_logo.jpg" alt="WebAssembly Logo" />
+            </div>
           </div>
         </div>
       </section>

@@ -103,7 +103,6 @@ export class Dial extends Component {
    */
   handleDragMove({ evt }) {
     // @ts-check
-
     if (evt.which !== 1) {
       this.setState({ mouseDown: false });
       return;
@@ -129,7 +128,7 @@ export class Dial extends Component {
     });
 
     this.offsetY = offsetY;
-    evt.stopImmediatePropagation();
+    evt.stopImmediatePropagation && evt.stopImmediatePropagation();
   }
 
   /**
@@ -150,6 +149,8 @@ export class Dial extends Component {
     this.props.valueChanged
       && clampNumber(this.state.value)
       && this.props.valueChanged(this.state.value, true);
+    typeof this.props.onValidateValue === 'function'
+      && this.props.onValidateValue(this.state.value);
     console.warn('fired mouse up evt');
   }
 
@@ -158,8 +159,26 @@ export class Dial extends Component {
     const img_w = BackgroundImage.imgWidthPx;
     const bg_y = this.h - BackgroundImage.imgHeightPx;
     const rotation = clampNumber(this.state.value) * 274;
+    /**
+     * @param {TouchEvent} ev 
+     */
+    const touchStart = (ev) => this.handleDragStart({ evt: { ...ev.evt, clientY: ev.evt.touches && ev.evt.touches[0].clientY } });
+    /**
+     * @param {TouchEvent} ev 
+     */
+    const touchMove = (ev) => this.handleDragMove({ evt: { ...ev.evt, clientY: ev.evt.touches && ev.evt.touches[0].clientY, which: 1 } });
+    /**
+     * @param {TouchEvent} ev 
+     */
+    const touchEnd = (ev) => this.handleDragEnd({ evt: { ...ev.evt, clientY: ev.evt.touches && ev.evt.touches[0].clientY, which: 1 } });
     return (
-      <Group x={x} y={y} onMouseDown={this.handleDragStart} onMouseMove={this.handleDragMove} onMouseUp={this.handleDragEnd}>
+      <Group x={x} y={y}
+        onMouseDown={this.handleDragStart}
+        onMouseMove={this.handleDragMove}
+        onMouseUp={this.handleDragEnd}
+        onTouchStart={touchStart}
+        onTouchMove={touchMove}
+        onTouchEnd={touchEnd}>
         {hideBackground ? null : <BackgroundImage x={0} y={bg_y} />}
         <RoundDialImage x={0} y={bg_y} onMouseDown={this.handleDragStart} onMouseMove={this.handleDragMove} />
         <HeaderText
@@ -206,26 +225,27 @@ export const ConnectLogDial = ({ hook, ...props }) => ConnectHook(hook)(({ value
   const logValue = Math.log(value);
   const _value = (hook && (value || value !== 0) && scaleToUnit(logValue)) || 0;
   const _valueChanged = value => valueChanged(Math.exp(scaleFromUnit(value)));
-  
+
   return <Dial {...props} value={_value} valueChanged={_valueChanged} />;
 });
 
-export const SnappyDial = ({segmentCount, ...props}) => {
-  const [state, setState] = useState(props.value);
-  useEffect(() => {
-    const snappedValue = Math.round(segmentCount * props.value) / segmentCount;
-    setState(snappedValue);
-  }, [props.value]);
-  const valueChanged = nextValue => {
+export const ConnectSnappyDial = ({ hook, segmentCount, ...props }) => ConnectHook(hook)(({ value, valueChanged }) => {
+  const [_value, _setValue] = useState(value);
+  useEffect(() => _setValue(value), [value]);
+  const valueChangedHook = nextValue => {
     const snappedValue = Math.round(segmentCount * nextValue) / segmentCount;
-    if (Math.abs(snappedValue - nextValue) > 0.05) {
-      setState(snappedValue);
-    }
-    if (typeof props.valueChanged === 'function'){
-      props.valueChanged(snappedValue);
-    }
+    valueChanged(snappedValue);
   };
-  return <Dial value={state} valueChanged={valueChanged} {...props} />;
+  const validateValue = nextValue => {
+    const snapValue = Math.round(segmentCount * nextValue) / segmentCount;
+    const outsideThreshold = Math.abs(snapValue - _value) > 0.05;
+    _setValue(outsideThreshold ? snapValue : _value);
+  };
+  return <Dial {...props} value={_value} valueChanged={valueChangedHook} onValidateValue={validateValue} />;
+});
+ConnectSnappyDial.propTypes = {
+  hook: PropTypes.array,
+  segmentCount: PropTypes.number,
 };
 
 export const ReduxDial = ({ store, action, ...others }) => {
@@ -239,7 +259,7 @@ ReduxDial.propTypes = {
 
 export const ConnectDial = ({ hook, ...props }) => ConnectHook(hook)(({ value, valueChanged }) => {
   const [min, max] = (hook && hook[2]) || [0, 1];
-  
+
   const scaleFromUnit = value => (max - min) * value + min;
   const scaleToUnit = value => (value - min) / (max - min);
 
@@ -249,13 +269,6 @@ export const ConnectDial = ({ hook, ...props }) => ConnectHook(hook)(({ value, v
   return <Dial {...props} value={_value} valueChanged={_valueChanged} />;
 });
 ConnectDial.propTypes = {
-  hook: PropTypes.array,
-};
-
-export const ConnectSnappyDial = ({ hook, ...props }) => ConnectHook(hook)(({ value, valueChanged }) => (
-  <SnappyDial {...props} value={value} valueChanged={valueChanged} />
-));
-ConnectSnappyDial.propTypes = {
   hook: PropTypes.array,
 };
 export default Dial;
