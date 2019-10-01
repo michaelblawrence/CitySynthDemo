@@ -21,17 +21,23 @@
     "@types/react": "16.9.2",
     "@types/react-dom": "16.9.0",
     "@types/react-redux": "^7.1.2",
-    "eslint-plugin-react": "^7.14.3"
+    "eslint-plugin-react": "^7.14.3",
+    "gh-pages": "^2.1.1"
   },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
+    "build-wasm-bin": "wasm-pack build .\\crate\\ -d .\\crate\\temp",
+    "build-wasm": "yarn build-wasm-bin",
+    "predeploy": "yarn build",
+    "deploy": "gh-pages -d build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
     "extends": "react-app"
   },
+  "homepage": "http://michaelblawrence.github.io/CitySynth",
   "browserslist": [
     ">0.2%",
     "not dead",

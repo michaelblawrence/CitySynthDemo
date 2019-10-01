@@ -1,0 +1,26 @@
+[package]
+name = "citysynth-wasm"
+version = "0.1.0"
+authors = ["Michael Lawrence <mblawrence27@gmail.com>"]
+edition = "2018"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[features]
+
+[dependencies]
+wasm-bindgen = "=0.2.34"
+console_error_panic_hook = { version = "0.1.1" }
+wee_alloc = { version = "0.4.2", optional = true }
+
+cityrust = { git = "https://gitlab.com/mblawrence27/city-rust.git" }
+
+[dev-dependencies]
+wasm-bindgen-test = "0.2"
+
+[profile.release]
+opt-level = "s"
+
+[net]
+git-fetch-with-cli = true
