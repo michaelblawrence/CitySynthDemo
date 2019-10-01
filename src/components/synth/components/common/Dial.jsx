@@ -89,6 +89,7 @@ export class Dial extends Component {
     this.handleDragStart = this.handleDragStart.bind(this);
     this.handleDragEnd = this.handleDragEnd.bind(this);
     this.handleDragMove = this.handleDragMove.bind(this);
+    this.handleScroll = this.handleScroll.bind(this);
   }
 
   componentDidUpdate(prevProps) {
@@ -110,11 +111,17 @@ export class Dial extends Component {
     if (!this.state.mouseDown) {
       return;
     }
-
+    
     let offsetY = evt.offsetY;
-
     let dy = this.offsetY - offsetY;
+    this.offsetY = offsetY;
 
+    this.incrementStateValue(dy);
+
+    evt.stopImmediatePropagation && evt.stopImmediatePropagation();
+  }
+
+  incrementStateValue(dy) {
     this.setState(state => {
       const nextValue = Math.round(state.value * 1000 + dy * 10) * 0.001;
       this.props.valueChanged
@@ -126,9 +133,6 @@ export class Dial extends Component {
         value: clampNumber(nextValue),
       };
     });
-
-    this.offsetY = offsetY;
-    evt.stopImmediatePropagation && evt.stopImmediatePropagation();
   }
 
   /**
@@ -154,6 +158,16 @@ export class Dial extends Component {
     console.warn('fired mouse up evt');
   }
 
+  /**
+   * @param {{evt: WheelEvent}} 
+   */
+  handleScroll({evt}) {
+    evt.stopPropagation(); evt.stopImmediatePropagation();
+    const nextY = -evt.wheelDeltaY;
+
+    this.incrementStateValue(nextY * 0.5);
+  }
+
   render() {
     const { x, y, hideBackground, noInactive } = this.props;
     const img_w = BackgroundImage.imgWidthPx;
@@ -176,9 +190,11 @@ export class Dial extends Component {
         onMouseDown={this.handleDragStart}
         onMouseMove={this.handleDragMove}
         onMouseUp={this.handleDragEnd}
+        onWheel={this.handleScroll}
         onTouchStart={touchStart}
         onTouchMove={touchMove}
-        onTouchEnd={touchEnd}>
+        onTouchEnd={touchEnd}
+      >
         {hideBackground ? null : <BackgroundImage x={0} y={bg_y} />}
         <RoundDialImage x={0} y={bg_y} onMouseDown={this.handleDragStart} onMouseMove={this.handleDragMove} />
         <HeaderText
