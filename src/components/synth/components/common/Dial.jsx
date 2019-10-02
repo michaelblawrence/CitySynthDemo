@@ -112,8 +112,8 @@ export class Dial extends Component {
       return;
     }
     
-    let offsetY = evt.offsetY;
-    let dy = this.offsetY - offsetY;
+    const offsetY = evt.offsetY;
+    const dy = this.offsetY - offsetY;
     this.offsetY = offsetY;
 
     this.incrementStateValue(dy);
@@ -128,7 +128,7 @@ export class Dial extends Component {
         && state.value !== nextValue
         && nextValue >= 0
         && nextValue <= 1
-        && this.props.valueChanged(nextValue);
+        && this.props.valueChanged(clampNumber(nextValue));
       return {
         value: clampNumber(nextValue),
       };
@@ -151,8 +151,7 @@ export class Dial extends Component {
       return;
     }
     this.props.valueChanged
-      && clampNumber(this.state.value)
-      && this.props.valueChanged(this.state.value, true);
+      && this.props.valueChanged(clampNumber(this.state.value), true);
     typeof this.props.onValidateValue === 'function'
       && this.props.onValidateValue(this.state.value);
     console.warn('fired mouse up evt');
