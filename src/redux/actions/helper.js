@@ -26,3 +26,7 @@ export const userEventActionFactory = (actionType) => {
 export const createStoreHook = (param, actionCreator, [min, max] = [null, null]) => {
   return [(state) => state[InversedParam[param]], actionCreator, [min, max]];
 };
+
+export const createMetaStoreHook = (param, actionCreator, [min, max] = [null, null]) => {
+  return [(state) => state.meta[InversedParam[param]], actionCreator, [min, max]];
+};
