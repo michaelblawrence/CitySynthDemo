@@ -1,15 +1,26 @@
 // @ts-check
-import { InversedParam } from './types';
+import { InvertedParam, InvertedMetaParam } from './types';
 
 export const getParamSetter = (state, action, param, refresh = false) => {
-  // eslint-disable-next-line no-unused-vars
   const { meta, ...params } = state;
   return {
     ...state,
     meta: {
+      ...meta,
       prevState: params,
       refresh
     },
-    [InversedParam[param]]: action.payload.value,
+    [InvertedParam[param]]: action.payload.value,
+  };
+};
+export const getMetaParamSetter = (state, action, param, refresh = false) => {
+  const { meta } = state;
+  return {
+    ...state,
+    meta: {
+      ...meta,
+      refresh,
+      [InvertedMetaParam[param]]: action.payload.value,
+    }
   };
 };

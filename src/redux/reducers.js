@@ -1,8 +1,8 @@
 // @ts-check
 
 import * as types from './actionTypes';
-import { getParamSetter } from './helper';
-import { Param } from './types';
+import { getParamSetter, getMetaParamSetter } from './helper';
+import { Param, MetaParam } from './types';
 
 export function rootReducer(state, action) {
   if (typeof state === 'undefined') {
@@ -24,6 +24,10 @@ function MetaReducer(action, state) {
   switch (action.type) {
     case types.SET_ALL_PARAMS:
       return { ...state, ...action.payload };
+    case types.ALT_KEY_PRESSED:
+      return getMetaParamSetter(state, { payload: { value: true } }, MetaParam.altEnabled);
+    case types.ALT_KEY_RELEASED:
+      return getMetaParamSetter(state, { payload: { value: false } }, MetaParam.altEnabled);
     default:
       return state;
   }
@@ -69,6 +73,10 @@ function FilterTouchReducer(action, state) {
   switch (action.type) {
     case types.SET_PARAM_FILTER_CUTOFF:
       return getParamSetter(state, action, Param.LPF);
+    case types.SET_PARAM_2ND_HARM_GAIN:
+      return getParamSetter(state, action, Param.Harmonic2Gain);
+    case types.SET_META_PARAM_ALT_ENABLED:
+      return getMetaParamSetter(state, action, MetaParam.altEnabled);
     default:
       return state;
   }

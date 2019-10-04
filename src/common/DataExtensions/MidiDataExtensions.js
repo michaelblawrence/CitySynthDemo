@@ -196,7 +196,7 @@ const Keys = {
 };
 
 export function altKeyPressed(keyCode) {
-  return keyCode === (Keys.RButton | Keys.ShiftKey);
+  return keyCode === Keys.Menu ||  keyCode === (Keys.RButton | Keys.ShiftKey);
 }
 
 /**

@@ -1,6 +1,6 @@
 // @ts-check
 
-import { InversedParam } from './redux/types';
+import { InvertedParam } from './redux/types';
 import { setAllParams, keyDownEvent, keyUpEvent } from './redux/actions/MetaActions';
 import { validateKeyCode, altKeyPressed } from './common/DataExtensions';
 import { store } from './store';
@@ -121,7 +121,7 @@ export async function getParamValue(paramIden) {
             resolve(data.value);
           }
         };
-        postWorkerAction(synthNode, WorkerActionFactory.getState({ param: InversedParam[paramIden] }));
+        postWorkerAction(synthNode, WorkerActionFactory.getState({ param: InvertedParam[paramIden] }));
       }
     }
     catch (ex) {
@@ -163,9 +163,10 @@ async function syncParamsState() {
 }
 
 export function publishParam(worket, paramIden, state, meta) {
-  const param = InversedParam[paramIden];
+  const param = InvertedParam[paramIden];
   if (worket && typeof state[param] !== 'undefined' && meta.prevState[param] !== state[param]) {
     worket.port.postMessage(WorkerActionFactory.setState({ param, value: state[param] }));
+    // TODO: replace with forward/inverse param type pairing
     if (meta.refresh) {
       worket.port.postMessage(WorkerActionFactory.triggerRefresh());
     }

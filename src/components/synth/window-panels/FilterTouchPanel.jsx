@@ -1,13 +1,14 @@
 import React from 'react';
 import { Group } from 'react-konva';
-import { HeaderText, ToggleIcon, PanelDivider, ConnectLogDial, ConnectTouchPad } from '../components';
-import { setParamFilterCutoff, setParamHarmonic2Gain } from '../../../redux/actions/FilterTouchActions';
-import { createStoreHook } from '../../../redux/actions/helper';
-import { Param } from '../../../redux/types';
+import { HeaderText, ToggleIcon, PanelDivider, ConnectLogDial, ToggleConnectTouchPad, ConnectToggle } from '../components';
+import { setParamFilterCutoff, setParamHarmonic2Gain, setMetaParamAltEnabled } from '../../../redux/actions/FilterTouchActions';
+import { createStoreHook, createMetaStoreHook } from '../../../redux/actions/helper';
+import { Param, MetaParam } from '../../../redux/types';
 
 const FilterCutoffHook = createStoreHook(Param.LPF, setParamFilterCutoff, [30, 21000]);
 const FilterCutoffTouchHook = createStoreHook(Param.LPF, setParamFilterCutoff, [30, 21000]);
 const Harmonic2GainTouchHook = createStoreHook(Param.Harmonic2Gain, setParamHarmonic2Gain, [0, 1]);
+const AltEnabledTouchHook = createMetaStoreHook(MetaParam.altEnabled, setMetaParamAltEnabled, [0, 1]);
 
 const FilterPanel = () => {
   return (
@@ -25,12 +26,13 @@ const HarmonicsCtrlPanel = () => {
     <Group>
       <HeaderText x={683} y={300} width={62} centered>TOUCHPAD</HeaderText>
 
-      <ToggleIcon x={844} y={294} w={28} h={24} />
-      <ConnectTouchPad
+      <ConnectToggle x={844} y={294} w={28} h={24} hook={AltEnabledTouchHook} />
+      <ToggleConnectTouchPad
         x={683}
         y={323}
         hHook={Harmonic2GainTouchHook}
         vHook={FilterCutoffTouchHook}
+        toggleHook={AltEnabledTouchHook}
         sensitivity={0.2}
         tapToToggle={true}
       />

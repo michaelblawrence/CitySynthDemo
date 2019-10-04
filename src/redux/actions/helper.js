@@ -1,4 +1,4 @@
-import { InversedParam } from '../types';
+import { InvertedParam, InvertedMetaParam } from '../types';
 
 export const setParamValueFactory = (actionType) => {
   return value => ({
@@ -24,9 +24,9 @@ export const userEventActionFactory = (actionType) => {
 };
 
 export const createStoreHook = (param, actionCreator, [min, max] = [null, null]) => {
-  return [(state) => state[InversedParam[param]], actionCreator, [min, max]];
+  return [(state) => state[InvertedParam[param]], actionCreator, [min, max]];
 };
 
 export const createMetaStoreHook = (param, actionCreator, [min, max] = [null, null]) => {
-  return [(state) => state.meta[InversedParam[param]], actionCreator, [min, max]];
+  return [(state) => state.meta[InvertedMetaParam[param]], actionCreator, [min, max]];
 };

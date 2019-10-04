@@ -9,7 +9,7 @@ import { filter, tap, shareReplay } from 'rxjs/operators';
 import { rootReducer } from './redux/reducers';
 import { Param } from './redux/types';
 import { initState, publishParam } from './workerActions';
-import { EVENT_KEY_UP, EVENT_KEY_DOWN } from './redux/actionTypes';
+import { EVENT_KEY_UP, EVENT_KEY_DOWN, ALT_KEY_PRESSED, ALT_KEY_RELEASED } from './redux/actionTypes';
 import { altKeyPressed } from './common/DataExtensions';
 
 const epicMiddleware = createEpicMiddleware();
@@ -18,8 +18,11 @@ const epicMiddleware = createEpicMiddleware();
  * @param {{type: string, payload: any}} ev
  */
 const handleTouchEnable = ev => {
-  if (altKeyPressed(ev.payload.keyCode)) {
-    // store.dispatch(ALT_KEY_PRESSED);
+  if (altKeyPressed(ev.payload)) {
+    store.dispatch({
+      type: ev.type === EVENT_KEY_DOWN ? ALT_KEY_PRESSED : ALT_KEY_RELEASED,
+      payload: {}
+    });
   }
 };
 
@@ -55,7 +58,13 @@ export function configureStore(preloadedState) {
   return store;
 }
 
-export const store = configureStore(undefined);
+const initialState = {
+  meta: {
+    prevState: {}
+  }
+};
+
+export const store = configureStore(initialState);
 
 const store$ = new Observable(subscriber => store.subscribe(() => subscriber.next(store.getState())));
 

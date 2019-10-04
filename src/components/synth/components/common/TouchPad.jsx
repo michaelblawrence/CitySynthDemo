@@ -40,12 +40,14 @@ export const TouchPad = ({ x, y, enabled, hValue, vValue, sensitivity, tapToTogg
    * @param {{evt: MouseEvent}} e
    */
   const handleDragMove = ({ evt }) => {
-    if (evt.which !== 1) {
-      setIsMouseDown(false);
-      return;
-    }
-    if (!mouseDown || !toggleEnabled) {
-      return;
+    if (!toggleEnabled) {
+      if (evt.which !== 1) {
+        setIsMouseDown(false);
+        return;
+      }
+      if (!mouseDown) {
+        return;
+      }
     }
     const { offsetX, offsetY } = evt;
     const dx = offsetX - prevOffset.x;
@@ -130,7 +132,7 @@ ConnectTouchPad.PropTypes = {
 };
 
 export const ToggleConnectTouchPad = ({ hHook, vHook, toggleHook, ...props }) =>
-  ConnectHook(toggleHook)(({ enabled, enableChanged }) => {
+  ConnectHook(toggleHook)(({ value: enabled, valueChanged: enableChanged }) => {
     const _enabled = (toggleHook && (enabled || enabled !== 0) && enabled > 0.5) || false;
     const _enableChanged = checked => enableChanged(+checked);
 
