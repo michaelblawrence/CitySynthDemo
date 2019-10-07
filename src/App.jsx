@@ -1,18 +1,17 @@
 import React from 'react';
-import { SynthWindow, Header, Footer, Portfolio, ProductAbout, TechStackAbout } from './components';
-import resumeData from './resumeData';
+import { Header, Footer, Portfolio, ProductAbout, TechStackAbout } from './components';
+import contentData from './resumeData';
+import { ProductDemo } from './components/portfolio/Demo';
 
 const App = () => {
   return (
     <div className="App">
-      <Header resumeData={resumeData} />
-      <SynthWindow />
-      <ProductAbout resumeData={resumeData}/>
-      <TechStackAbout resumeData={resumeData} />
-      <Portfolio resumeData={resumeData} />
-      {/* <Testimonials resumeData={resumeData}/> */}
-      {/* <ContactUs resumeData={resumeData}/> */}
-      <Footer resumeData={resumeData} />
+      <Header resumeData={contentData} />
+      <ProductDemo resumeData={contentData} />
+      <ProductAbout resumeData={contentData}/>
+      <TechStackAbout resumeData={contentData} />
+      <Portfolio resumeData={contentData} />
+      <Footer resumeData={contentData} />
     </div>
   );
 };

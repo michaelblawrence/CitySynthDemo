@@ -1,3 +1,5 @@
+import { reverseDict } from '../../redux/types';
+
 const Keys = {
   Modifiers: -65536,
   None: 0,
@@ -196,7 +198,7 @@ const Keys = {
 };
 
 export function altKeyPressed(keyCode) {
-  return keyCode === Keys.Menu ||  keyCode === (Keys.RButton | Keys.ShiftKey);
+  return keyCode === Keys.Menu || keyCode === (Keys.RButton | Keys.ShiftKey);
 }
 
 /**
@@ -204,7 +206,7 @@ export function altKeyPressed(keyCode) {
 */
 export function validateKeyCode(keyCode) {
   switch (keyCode) {
-  //Keyboard Keys
+    //Keyboard Keys
     case Keys.Q:
     case Keys.A:
     case Keys.W:
@@ -229,3 +231,34 @@ export function validateKeyCode(keyCode) {
       return false;
   }
 }
+
+const midiMapping = {
+  //Keyboard Keys
+  [Keys.A]: 60,
+  [Keys.W]: 61,
+  [Keys.S]: 62,
+  [Keys.E]: 63,
+  [Keys.D]: 64,
+  [Keys.F]: 65,
+  [Keys.T]: 66,
+  [Keys.G]: 67,
+  [Keys.Y]: 68,
+  [Keys.H]: 69,
+  [Keys.U]: 70,
+  [Keys.J]: 71,
+  [Keys.K]: 72,
+  [Keys.O]: 73,
+  [Keys.L]: 74,
+  [Keys.P]: 75,
+  [Keys.OemSemicolon]: 76,
+  [Keys.Oemtilde]: 77,
+};
+
+/**
+* @param {number} keyCode
+*/
+export function mapKeyCodeToMidi(keyCode) {
+  return midiMapping[keyCode];
+}
+
+export const midiToKeyCodeMapping = reverseDict(midiMapping);

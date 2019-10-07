@@ -55,11 +55,11 @@ function AmpEnvReducer(action, state) {
 function FilterEnvReducer(action, state) {
   switch (action.type) {
     case types.SET_ENABLE_FILTER_EG:
-      return getParamSetter(state, action, Param.LPFenvelope);
+      return getParamSetter(state, action, Param.LPFenvelope, true);
     case types.SET_PARAM_FILTER_EG_ATTACK:
-      return getParamSetter(state, action, Param.LPFattack);
+      return getParamSetter(state, action, Param.LPFattack, true);
     case types.SET_PARAM_FILTER_EG_RELEASE:
-      return getParamSetter(state, action, Param.LPFrelease);
+      return getParamSetter(state, action, Param.LPFrelease, true);
     case types.SET_PARAM_FILTER_EG_FLOOR:
       return getParamSetter(state, action, Param.LPFfloor);
     case types.SET_PARAM_FILTER_EG_CEILING:
@@ -99,6 +99,8 @@ function OscReducer(action, state) {
       return getParamSetter(state, action, Param.HarmonicPhase);
     case types.SET_PARAM_OSC_WAVEFUNCTION:
       return getParamSetter(state, action, Param.WFunction);
+    case types.SET_PARAM_OSC_GAIN:
+      return getParamSetter(state, action, Param.Gain);
     case types.SET_PARAM_DELAY_WET:
       return getParamSetter(state, action, Param.DelayWet);
     case types.SET_PARAM_REVERB_LENGTH:

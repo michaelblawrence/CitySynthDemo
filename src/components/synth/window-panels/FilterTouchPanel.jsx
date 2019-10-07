@@ -7,7 +7,7 @@ import { Param, MetaParam } from '../../../redux/types';
 
 const FilterCutoffHook = createStoreHook(Param.LPF, setParamFilterCutoff, [30, 21000]);
 const FilterCutoffTouchHook = createStoreHook(Param.LPF, setParamFilterCutoff, [30, 21000]);
-const Harmonic2GainTouchHook = createStoreHook(Param.Harmonic2Gain, setParamHarmonic2Gain, [0, 1]);
+const Harmonic2GainTouchHook = createStoreHook(Param.Harmonic2Gain, setParamHarmonic2Gain, [0, 100]);
 const AltEnabledTouchHook = createMetaStoreHook(MetaParam.altEnabled, setMetaParamAltEnabled, [0, 1]);
 
 const FilterPanel = () => {

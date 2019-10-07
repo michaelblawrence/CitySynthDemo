@@ -19,11 +19,11 @@ export const SynthWindow = () => {
   };
 
   return (
-    <section id="demo">
+    <div>
       <div className="row">
-        <h2 className="feature-header">Try the Live Beta in your browser!</h2>
+        <h2 className="feature-header">Try the Live Synth in your browser!</h2>
       </div>
-      <div className={classNames({'row': true, 'row--synth': true, 'blur-animation': showLoading})}>
+      <div className={classNames({ 'row': true, 'row--synth': true, 'blur-animation': showLoading })}>
         <BaseWindow>
           <OscGroupPanel />
           <EnvGroupPanel />
@@ -39,7 +39,7 @@ export const SynthWindow = () => {
           <InitialWindowOverlay hideOverlay={hideOverlay} isLoading={showLoading} />
         }
       </div>
-    </section>
+    </div>
   );
 };
 

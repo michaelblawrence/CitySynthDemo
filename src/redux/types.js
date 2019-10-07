@@ -1,6 +1,6 @@
 // @ts-check
 
-function reverseDict(dict) {
+export function reverseDict(dict) {
   return Object.keys(dict)
     .reduce((rev, key) => ({ ...rev, [dict[key]]: key }), {});
 }

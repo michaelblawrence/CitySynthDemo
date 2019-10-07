@@ -312,6 +312,111 @@ ul#nav li.current a {
    padding-top: 15px;
 }
 
+#container #glow, #container #roll, body #glow, body #roll {
+   display: none;
+   width: 100%;
+   height: calc(100% - 130px);
+   top: 0;
+   left: 0
+}
+
+#container #bottom, body #bottom {
+   width: 100%;
+   height: 30px;
+   bottom: 0;
+   left: 0;
+   position: absolute;
+   background-color: #222;
+   box-shadow: inset 0 12px 30px -5px rgba(0, 0, 0, .75)
+}
+
+#container.focus {
+   -webkit-filter: none;
+   filter: none;
+   opacity: 1
+}
+
+.row.keys {
+   margin-top: 40px;
+   background-color: #2f2f2f;
+   padding: 10px;
+}
+
+.keyboard-container {
+   overflow: hidden;
+   width: 275px;
+   height: 125px;
+   margin: 0 auto;
+   box-shadow: 0px 2px 2px #292929;
+}
+
+#keyboard {
+   display: block;
+   margin-left: -5px;
+   transform: translate(0, 0);
+   /* width: calc(100% - 20px); */
+   width: 1300px;
+   height: 130px;
+}
+
+#keyboard .key {
+   position: absolute;
+   -webkit-user-select: none;
+   -moz-user-select: none;
+   -ms-user-select: none;
+   user-select: none
+}
+
+#keyboard .key {
+   height: calc(100% - 2 * 2px);
+   width: 10px;
+   left: 0;
+   top: 0
+}
+
+#keyboard .key.black {
+   z-index: 1;
+   height: 50%
+}
+
+#keyboard .key.black .fill {
+   background-color: #4e4e4e;
+   width: calc(100% - 8px);
+   left: 4px
+}
+
+#keyboard .key.white {
+   z-index: 0
+}
+
+#keyboard .key.white .fill {
+   background-color: #3c3c3c;
+}
+
+#keyboard .key .fill {
+   border: 1px solid #212121;
+   position: absolute;
+   top: 0;
+   left: 0;
+   width: 100%;
+   height: 100%;
+   pointer-events: none;
+   transition: background-color 0.6s;
+}
+
+#keyboard .key .fill.active {
+   background-color: #a56827;
+   transition: background-color 0s;
+   transition-property: background-color;
+   transition-duration: 0s;
+   transition-timing-function: cubic-bezier(0, 0.36, 0.58, 1);
+   transition-delay: 0s;
+}
+
+#keyboard .key .highlight.ai {
+   background-color: #fff
+}
+
 .row--synth {
    position: relative;
    width: 925px;
@@ -692,7 +797,7 @@ ul#nav li.current a {
 #portfolio-wrapper {
    display: flex;
    justify-content: center;
- }
+}
 
 .portfolio-item .item-wrap a {
    display: block;

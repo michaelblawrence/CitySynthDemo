@@ -3,10 +3,12 @@
 import { InvertedParam } from './redux/types';
 import { setAllParams, keyDownEvent, keyUpEvent } from './redux/actions/MetaActions';
 import { validateKeyCode, altKeyPressed } from './common/DataExtensions';
-import { store } from './store';
+import { store, keyEvents$ } from './store';
+import * as types from './redux/actionTypes';
 // eslint-disable-next-line no-unused-vars
-import { Observable, ReplaySubject, Subscription } from 'rxjs';
+import { Observable, Subscription, Subject } from 'rxjs';
 import { filter, take, map, shareReplay } from 'rxjs/operators';
+import { ofType } from 'redux-observable';
 
 /**
  * @type {{ 
@@ -24,7 +26,7 @@ export const initState = {
 };
 //could await this
 
-const presetPromptChar = '.';
+const presetPromptKey = {key: '.', keyCode: 190};
 
 const WorkerActions = {
   MODULE: 'MODULE',
@@ -90,8 +92,8 @@ export async function getWasmModule() {
     shareReplay()
   );
   initState.synthWaveformSubscription = port$.pipe(
-    filter(({message}) => message.data.type === 'WAVEFORM_PUSH'),
-    map(({message}) => message.data.samples),
+    filter(({ message }) => message.data.type === 'WAVEFORM_PUSH'),
+    map(({ message }) => message.data.samples),
   ).subscribe(samples => waveformSubject.next(samples));
   initState.synthNodePort$ = port$.pipe(
     filter(next => next.error === null),
@@ -100,7 +102,7 @@ export async function getWasmModule() {
   await syncParamsState();
 }
 
-const waveformSubject = new ReplaySubject(1);
+const waveformSubject = new Subject();
 export const waveform$ = waveformSubject.pipe(shareReplay());
 
 export async function getParamValue(paramIden) {
@@ -162,64 +164,85 @@ async function syncParamsState() {
   store.dispatch(setAllParams(dump));
 }
 
-export function publishParam(worket, paramIden, state, meta) {
+export function publishParam(paramIden, state, meta) {
   const param = InvertedParam[paramIden];
-  if (worket && typeof state[param] !== 'undefined' && meta.prevState[param] !== state[param]) {
-    worket.port.postMessage(WorkerActionFactory.setState({ param, value: state[param] }));
+  const { synthNode } = initState;
+  if (synthNode && typeof state[param] !== 'undefined' && meta.prevState[param] !== state[param]) {
+    synthNode.port.postMessage(WorkerActionFactory.setState({ param, value: state[param] }));
     // TODO: replace with forward/inverse param type pairing
     if (meta.refresh) {
-      worket.port.postMessage(WorkerActionFactory.triggerRefresh());
+      synthNode.port.postMessage(WorkerActionFactory.triggerRefresh());
     }
   }
 }
 
 /**
- * @param {KeyboardEvent} evt
+ * @param {{keyCode: number}} evt
  */
-const handleKeyDown = (evt) => {
+const handleKeyDown = ({ keyCode }) => {
   const { synthNode } = initState;
-  if (altKeyPressed(evt.keyCode)) {
+  if (altKeyPressed(keyCode)) {
     // debugger; // send action to state.. sub to middelware one osc comps for example
   }
-  if (!validateKeyCode(evt.keyCode)) {
+  if (!validateKeyCode(keyCode)) {
     return;
   }
-  postWorkerAction(synthNode, WorkerActionFactory.sendKeyDown(evt.keyCode));
+  postWorkerAction(synthNode, WorkerActionFactory.sendKeyDown(keyCode));
 };
 
-window.addEventListener('keydown', (evt) => {
-  const { synthNode } = initState;
-  if (synthNode && !evt.repeat) {
-    store.dispatch(keyDownEvent(evt.keyCode));
-    handleKeyDown(evt);
-  }
-});
-
 /**
- * @param {KeyboardEvent} evt
+ * @param {{keyCode: number}} evt
  */
-const handleKeyUp = (evt) => {
+const handleKeyUp = ({ keyCode }) => {
   const { synthNode } = initState;
-  if (evt.key === presetPromptChar) {
+  if (keyCode === presetPromptKey.keyCode) {
     const samplePresetLine = '56:T-Organic:318|a:1;d:94;s:0.86;r:2;h:2;hc:0.2190476;hp:0;w:2;hw:0;b:-1;lpf:13441.8;lfo:0;prate:0;pwidth:0;arate:30;awidth:0;lwidth:500;la:5;lr:5;lf:5;lc:5000;delay:120;dwet:0.2057;rwet:0.04;filter:0;lpfenv:0;sub:0.3668478';
     const presetLine = prompt('preset data: ', samplePresetLine);
     postWorkerAction(synthNode, WorkerActionFactory.setPreset(presetLine));
     syncParamsState();
     return;
   }
-  if (altKeyPressed(evt.keyCode)) {
-    // debugger; // send action to state.. sub to middelware one osc comps for example
-  }
-  if (!validateKeyCode(evt.keyCode)) {
+  if (!validateKeyCode(keyCode)) {
     return;
   }
-  postWorkerAction(synthNode, WorkerActionFactory.sendKeyUp(evt.keyCode));
+  postWorkerAction(synthNode, WorkerActionFactory.sendKeyUp(keyCode));
 };
+
+const keyDown$ = keyEvents$.pipe(
+  ofType(types.EVENT_KEY_DOWN),
+  map(action => action.payload)
+);
+
+keyDown$.subscribe(keyCode => {
+  const { synthNode } = initState;
+  if (synthNode) {
+    handleKeyDown({ keyCode });
+  }
+});
+
+const keyUp$ = keyEvents$.pipe(
+  ofType(types.EVENT_KEY_UP),
+  map(action => action.payload)
+);
+
+keyUp$.subscribe(keyCode => {
+  const { synthNode } = initState;
+  if (synthNode) {
+    // @ts-ignore
+    handleKeyUp({ keyCode });
+  }
+});
+
+window.addEventListener('keydown', (evt) => {
+  const { synthNode } = initState;
+  if (synthNode && !evt.repeat) {
+    store.dispatch(keyDownEvent(evt.keyCode));
+  }
+});
 
 window.addEventListener('keyup', (evt) => {
   const { synthNode } = initState;
   if (synthNode && !evt.repeat) {
     store.dispatch(keyUpEvent(evt.keyCode));
-    handleKeyUp(evt);
   }
 });

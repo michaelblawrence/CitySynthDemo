@@ -1,12 +1,12 @@
 /* eslint-disable react/prop-types */
 import React, { Component } from 'react';
+
 export class ProductAbout extends Component {
   render() {
     let resumeData = this.props.resumeData;
     return (
       <section id={'about'}>
         <div className="row">
-
           <div className="four columns">
 
             <img className="tech-logo" src="images/cropped-osc-panel1.png" alt="CitySynth in action" />
@@ -51,13 +51,13 @@ export class TechStackAbout extends Component {
             <h2>How it works</h2>
             <p>
               {
-                resumeData.aboutme
+                resumeData.prodectTech
               }
             </p>
 
             <div className="row">
 
-              <div className="columns contact-details">
+              {/* <div className="columns contact-details">
 
                 <h2>Contact Details</h2>
                 <p className="address">
@@ -69,7 +69,7 @@ export class TechStackAbout extends Component {
                   <br></br>
                   <span>{resumeData.website}</span>
                 </p>
-              </div>
+              </div> */}
             </div>
           </div>
 
