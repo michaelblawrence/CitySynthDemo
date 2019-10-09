@@ -1,16 +1,16 @@
 // @ts-check
 
 import { composeWithDevTools } from 'redux-devtools-extension';
-import { createEpicMiddleware, combineEpics } from 'redux-observable';
+import { createEpicMiddleware, combineEpics, ofType } from 'redux-observable';
 import { createStore, applyMiddleware } from 'redux';
-import { Observable, Subject } from 'rxjs';
-import { filter, shareReplay } from 'rxjs/operators';
+import { Observable, Subject, BehaviorSubject } from 'rxjs';
+import { filter, shareReplay, map, distinctUntilChanged } from 'rxjs/operators';
 
 import { rootReducer } from './redux/reducers';
-import { Param } from './redux/types';
+import { Param, InvertedMetaParam, MetaParam } from './redux/types';
 import { publishParam } from './workerActions';
-import { EVENT_KEY_UP, EVENT_KEY_DOWN, ALT_KEY_PRESSED, ALT_KEY_RELEASED } from './redux/actionTypes';
-import { altKeyPressed } from './common/DataExtensions';
+import { EVENT_KEY_UP, EVENT_KEY_DOWN, ALT_KEY_PRESSED, ALT_KEY_RELEASED, EVENT_OCTAVE_INCREMENT } from './redux/actionTypes';
+import { altKeyPressed, octaveKeyPressed } from './common/DataExtensions';
 
 const epicMiddleware = createEpicMiddleware();
 
@@ -18,7 +18,14 @@ const epicMiddleware = createEpicMiddleware();
  * @param {{type: string, payload: any}} ev
  */
 const handleTouchEnable = ev => {
-  if (altKeyPressed(ev.payload)) {
+  const octaveKey = octaveKeyPressed(ev.payload && ev.payload.keyCode);
+  if (octaveKey && ev.type === EVENT_KEY_DOWN) {
+    store.dispatch({
+      type: EVENT_OCTAVE_INCREMENT,
+      payload: octaveKey
+    });
+  }
+  if (altKeyPressed(ev.payload && ev.payload.keyCode)) {
     store.dispatch({
       type: ev.type === EVENT_KEY_DOWN ? ALT_KEY_PRESSED : ALT_KEY_RELEASED,
       payload: {}
@@ -26,10 +33,11 @@ const handleTouchEnable = ev => {
   }
 };
 
-/** @type Subject<{type: string, payload: number}> */
+/** @type Subject<{type: string, payload: {keyCode: number, oct?: number}}> */
 const keyEventsSubject = new Subject();
-
 export const keyEvents$ = keyEventsSubject.asObservable();
+
+const octaveSubject = new BehaviorSubject(0);
 
 /**
  * @param {Observable<{type: string, payload: any}>} action$ 
@@ -40,6 +48,12 @@ const rootEpic = action$ => {
   );
   keyDown$.subscribe(handleTouchEnable);
   keyDown$.subscribe(keyEventsSubject);
+
+  const octaveChanged$ = action$.pipe(
+    ofType(EVENT_OCTAVE_INCREMENT),
+    map(action => action.payload)
+  );
+  octaveChanged$.subscribe(octaveSubject);
 
   return new Observable(() => {});
 };
@@ -69,7 +83,8 @@ export function configureStore(preloadedState) {
 
 const initialState = {
   meta: {
-    prevState: {}
+    prevState: {},
+    [InvertedMetaParam[MetaParam.kbOctave]] : -1
   }
 };
 
@@ -95,9 +110,13 @@ store$.subscribe(({ meta, ...state }) => {
 
 const replayStore$ = store$.pipe(shareReplay());
 
-export function observerSubscribe(callback) {
+export function observerSubscribe(callback, selector = null) {
+  const mappedStore$ = selector
+    ? replayStore$.pipe(distinctUntilChanged((x, y) => selector(x) === selector(y)))
+    : replayStore$;
+
   // eslint-disable-next-line no-unused-vars
-  const actionSub = replayStore$.subscribe(state => callback(state));
+  const actionSub = mappedStore$.subscribe(state => callback(state));
   return () => actionSub.unsubscribe();
 }
 

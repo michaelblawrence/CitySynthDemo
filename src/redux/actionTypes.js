@@ -1,5 +1,6 @@
 export const EVENT_KEY_DOWN              = 'EVENT_KEY_DOWN';
 export const EVENT_KEY_UP                = 'EVENT_KEY_UP';
+export const EVENT_OCTAVE_INCREMENT      = 'EVENT_OCTAVE_INCREMENT';
 export const SET_ALL_PARAMS              = 'SET_ALL_PARAMS';
 export const ALT_KEY_PRESSED             = 'ALT_KEY_PRESSED';
 export const ALT_KEY_RELEASED            = 'ALT_KEY_RELEASED';

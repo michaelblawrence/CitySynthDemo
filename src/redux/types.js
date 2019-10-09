@@ -7,7 +7,8 @@ export function reverseDict(dict) {
 
 export const MetaParam = Object.freeze({
   refresh: 0,
-  altEnabled: 1
+  altEnabled: 1,
+  kbOctave: 2,
 });
 export const InvertedMetaParam = reverseDict(MetaParam);
 

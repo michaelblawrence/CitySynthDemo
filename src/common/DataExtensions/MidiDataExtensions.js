@@ -201,6 +201,17 @@ export function altKeyPressed(keyCode) {
   return keyCode === Keys.Menu || keyCode === (Keys.RButton | Keys.ShiftKey);
 }
 
+export function octaveKeyPressed(keyCode) {
+  switch (keyCode) {
+    case Keys.Z:
+      return -1;
+    case Keys.X:
+      return +1;
+    default:
+      return null;
+  }
+}
+
 /**
 * @param {number} keyCode
 */

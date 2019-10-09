@@ -9,7 +9,7 @@ export const ConnectHook = (hook, initalValue = 0.5, scale = false) => (componen
     const unsubscribe = observerSubscribe((storage) => {
       const { param } = mapStateToProps(storage);
       setState(param);
-    });
+    }, hook[0]);
     return unsubscribe;
   }, [initalValue]);
 

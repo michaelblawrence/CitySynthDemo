@@ -94,7 +94,7 @@ function handleKeyDown(data) {
      */
   const synth = globalThis.synth;
   if (synth) {
-    synth.note_on(data, -1);
+    synth.note_on(data.keyCode, data.oct);
   }
 }
 

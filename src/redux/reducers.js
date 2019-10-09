@@ -25,9 +25,11 @@ function MetaReducer(action, state) {
     case types.SET_ALL_PARAMS:
       return { ...state, ...action.payload };
     case types.ALT_KEY_PRESSED:
-      return getMetaParamSetter(state, { payload: { value: true } }, MetaParam.altEnabled);
+      return getMetaParamSetter(state, true, MetaParam.altEnabled);
     case types.ALT_KEY_RELEASED:
-      return getMetaParamSetter(state, { payload: { value: false } }, MetaParam.altEnabled);
+      return getMetaParamSetter(state, false, MetaParam.altEnabled);
+    case types.EVENT_OCTAVE_INCREMENT:
+      return getMetaParamSetter(state, action.payload, MetaParam.kbOctave, true);
     default:
       return state;
   }
@@ -76,7 +78,7 @@ function FilterTouchReducer(action, state) {
     case types.SET_PARAM_2ND_HARM_GAIN:
       return getParamSetter(state, action, Param.Harmonic2Gain);
     case types.SET_META_PARAM_ALT_ENABLED:
-      return getMetaParamSetter(state, action, MetaParam.altEnabled);
+      return getMetaParamSetter(state, action.payload.value, MetaParam.altEnabled);
     default:
       return state;
   }

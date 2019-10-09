@@ -1,12 +1,12 @@
 // @ts-check
 
-import { InvertedParam } from './redux/types';
+import { InvertedParam, InvertedMetaParam, MetaParam } from './redux/types';
 import { setAllParams, keyDownEvent, keyUpEvent } from './redux/actions/MetaActions';
-import { validateKeyCode, altKeyPressed } from './common/DataExtensions';
-import { store, keyEvents$ } from './store';
+import { validateKeyCode } from './common/DataExtensions';
+import { store, keyEvents$, observerSubscribe } from './store';
 import * as types from './redux/actionTypes';
 // eslint-disable-next-line no-unused-vars
-import { Observable, Subscription, Subject } from 'rxjs';
+import { Observable, Subscription, Subject, BehaviorSubject } from 'rxjs';
 import { filter, take, map, shareReplay } from 'rxjs/operators';
 import { ofType } from 'redux-observable';
 
@@ -26,7 +26,7 @@ export const initState = {
 };
 //could await this
 
-const presetPromptKey = {key: '.', keyCode: 190};
+const presetPromptKey = { key: '.', keyCode: 190 };
 
 const WorkerActions = {
   MODULE: 'MODULE',
@@ -41,7 +41,7 @@ const WorkerActions = {
 
 const WorkerActionFactory = {
   sendModule: (module) => ({ type: WorkerActions.MODULE, data: module }),
-  sendKeyDown: (keyCode) => ({ type: WorkerActions.KEY_DOWN, data: keyCode }),
+  sendKeyDown: (keyEvent) => ({ type: WorkerActions.KEY_DOWN, data: keyEvent }),
   sendKeyUp: (keyCode) => ({ type: WorkerActions.KEY_UP, data: keyCode }),
   getState: (paramIden) => ({ type: WorkerActions.GET_PARAM, data: paramIden }),
   setState: (paramData) => ({ type: WorkerActions.SET_PARAM, data: paramData }),
@@ -177,17 +177,14 @@ export function publishParam(paramIden, state, meta) {
 }
 
 /**
- * @param {{keyCode: number}} evt
+ * @param {{keyCode: number, oct?: number}} evt
  */
-const handleKeyDown = ({ keyCode }) => {
+const handleKeyDown = ({ keyCode, oct }) => {
   const { synthNode } = initState;
-  if (altKeyPressed(keyCode)) {
-    // debugger; // send action to state.. sub to middelware one osc comps for example
-  }
   if (!validateKeyCode(keyCode)) {
     return;
   }
-  postWorkerAction(synthNode, WorkerActionFactory.sendKeyDown(keyCode));
+  postWorkerAction(synthNode, WorkerActionFactory.sendKeyDown({keyCode, oct: oct || 0}));
 };
 
 /**
@@ -213,10 +210,10 @@ const keyDown$ = keyEvents$.pipe(
   map(action => action.payload)
 );
 
-keyDown$.subscribe(keyCode => {
+keyDown$.subscribe(keyEvt => {
   const { synthNode } = initState;
   if (synthNode) {
-    handleKeyDown({ keyCode });
+    handleKeyDown(keyEvt);
   }
 });
 
@@ -225,7 +222,7 @@ const keyUp$ = keyEvents$.pipe(
   map(action => action.payload)
 );
 
-keyUp$.subscribe(keyCode => {
+keyUp$.subscribe(({keyCode}) => {
   const { synthNode } = initState;
   if (synthNode) {
     // @ts-ignore
@@ -233,16 +230,22 @@ keyUp$.subscribe(keyCode => {
   }
 });
 
+const octaveSubject = new BehaviorSubject(0);
+const octaveSelector = store => store.meta[InvertedMetaParam[MetaParam.kbOctave]] || 0;
+observerSubscribe(store => {
+  octaveSubject.next(octaveSelector(store));
+}, octaveSelector);
+
 window.addEventListener('keydown', (evt) => {
   const { synthNode } = initState;
   if (synthNode && !evt.repeat) {
-    store.dispatch(keyDownEvent(evt.keyCode));
+    store.dispatch(keyDownEvent({keyCode: evt.keyCode, oct: octaveSubject.getValue()}));
   }
 });
 
 window.addEventListener('keyup', (evt) => {
   const { synthNode } = initState;
   if (synthNode && !evt.repeat) {
-    store.dispatch(keyUpEvent(evt.keyCode));
+    store.dispatch(keyUpEvent({keyCode: evt.keyCode}));
   }
 });

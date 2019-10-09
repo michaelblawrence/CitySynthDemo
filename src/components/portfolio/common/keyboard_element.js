@@ -66,7 +66,7 @@ export class KeyboardElement {
   handleMouse(ev, isDown, idx) {
     const actionCreator = isDown ? keyDownEvent : keyUpEvent;
     const keyCode = +midiToKeyCodeMapping[idx];
-    store.dispatch(actionCreator(keyCode));
+    store.dispatch(actionCreator({keyCode, oct: -1}));
   }
 
   /**
