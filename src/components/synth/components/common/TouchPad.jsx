@@ -67,10 +67,7 @@ export const TouchPad = ({ x, y, enabled, hValue, vValue, sensitivity, tapToTogg
     setPrevOffset({ x: offsetX, y: offsetY });
   };
 
-  /**
-   * @param {{evt: MouseEvent}} e
-   */
-  const handleDragEnd = ({ evt }) => {
+  const handleDragEnd = () => {
     if (!mouseDown) {
       return;
     }
@@ -108,13 +105,13 @@ TouchPad.defaultProps = {
   sensitivity: 0.5,
 };
 
-export const ConnectTouchPad = ({ hHook, vHook, ...props }) => {
+export const ConnectTouchPad = ({ hHook, vHook, hLogScale, vLogScale, ...props }) => {
   const splitHandle = ({ hValueChanged, vValueChanged }) =>
     ({ hValue, vValue }) => { hValueChanged(hValue); vValueChanged(vValue); };
 
-  const HorizontalHook = ConnectHook(hHook, 0, true)(
+  const XYHook = ConnectHook(hHook, 0, true, hLogScale)(
     ({ value: hValue, valueChanged: hValueChanged }) =>
-      ConnectHook(vHook, 0, true)(
+      ConnectHook(vHook, 0, true, vLogScale)(
         ({ value: vValue, valueChanged: vValueChanged }) =>
           <TouchPad {...props}
             hValue={hValue}
@@ -123,18 +120,23 @@ export const ConnectTouchPad = ({ hHook, vHook, ...props }) => {
           />
       )
   );
-  return HorizontalHook;
+
+  return XYHook;
 };
 
-ConnectTouchPad.PropTypes = {
+ConnectTouchPad.propTypes = {
   hHook: PropTypes.object,
   vHook: PropTypes.object,
+  hLogScale: PropTypes.bool,
+  vLogScale: PropTypes.bool,
 };
 
-export const ToggleConnectTouchPad = ({ hHook, vHook, toggleHook, ...props }) =>
+export const ToggleConnectTouchPad = ({ hHook, vHook, hLogScale, vLogScale, toggleHook, ...props }) =>
   ConnectHook(toggleHook)(({ value: enabled, valueChanged: enableChanged }) => {
     const _enabled = (toggleHook && (enabled || enabled !== 0) && enabled > 0.5) || false;
     const _enableChanged = checked => enableChanged(+checked);
 
-    return <ConnectTouchPad {...props} hHook={hHook} vHook={vHook} enabledChanged={_enableChanged} enabled={_enabled} />;
+    return <ConnectTouchPad {...props}
+      hHook={hHook} vHook={vHook} hLogScale={hLogScale} vLogScale={vLogScale}
+      enabledChanged={_enableChanged} enabled={_enabled} />;
   });

@@ -89,6 +89,7 @@ export class KeyboardElement {
   keyUp(noteNum) {
     if (noteNum in this.keys) {
       if (!(this.notes[noteNum] && this.notes[noteNum].length)) {
+        // eslint-disable-next-line no-console
         console.warn('note off before note on');
       }
       else {

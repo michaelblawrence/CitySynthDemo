@@ -6,8 +6,6 @@ use cityrust::utils::state::StateManager;
 
 use wasm_bindgen::prelude::*;
 
-use crate::utils;
-
 const DEFAULT_SAMPLE_RATE: f64 = 44100.0;
 
 #[wasm_bindgen]
@@ -20,7 +18,7 @@ pub struct CitySynth {
 #[wasm_bindgen]
 impl CitySynth {
     pub fn new(voices_count: usize, sample_rate: Option<f64>) -> Self {
-        utils::set_panic_hook();
+        crate::set_panic_hook();
         let mut bucket = StateManager::new();
         loader::load_defaults(&mut bucket);
 

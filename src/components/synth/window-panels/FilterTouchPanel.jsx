@@ -32,8 +32,9 @@ const HarmonicsCtrlPanel = () => {
         y={323}
         hHook={Harmonic2GainTouchHook}
         vHook={FilterCutoffTouchHook}
+        vLogScale={true}
         toggleHook={AltEnabledTouchHook}
-        sensitivity={0.2}
+        sensitivity={0.5}
         tapToToggle={true}
       />
     </Group>

@@ -16,13 +16,15 @@ import { ofType } from 'redux-observable';
  *  synthNode: AudioWorkletNode, 
  *  synthNodePort$: Observable<any>, 
  *  synthWaveformSubscription: Subscription
+ *  dumpParamsSubscription: Subscription
  * }}
  */
 export const initState = {
   hasStarted: false,
   synthNode: null,
   synthNodePort$: null,
-  synthWaveformSubscription: null
+  synthWaveformSubscription: null,
+  dumpParamsSubscription: null
 };
 //could await this
 
@@ -88,66 +90,49 @@ export async function getWasmModule() {
       synthNode.port.onmessage = null;
       synthNode.port.onmessageerror = null;
     };
-  }).pipe(
-    shareReplay()
-  );
-  initState.synthWaveformSubscription = port$.pipe(
-    filter(({ message }) => message.data.type === 'WAVEFORM_PUSH'),
-    map(({ message }) => message.data.samples),
-  ).subscribe(samples => waveformSubject.next(samples));
-  initState.synthNodePort$ = port$.pipe(
-    filter(next => next.error === null),
-    map(next => next.message)
-  );
+  }).pipe(shareReplay());
+  setupInitState(port$);
   await syncParamsState();
 }
 
 const waveformSubject = new Subject();
-export const waveform$ = waveformSubject.pipe(shareReplay());
+export const waveform$ = waveformSubject.asObservable();
 
-export async function getParamValue(paramIden) {
-  return await new Promise((resolve, reject) => {
-    try {
-      /**
-       * @type {{synthNode: AudioWorkletNode}}
-       */
-      const { synthNode } = initState;
-      if (synthNode && typeof paramIden !== 'undefined') {
-        /**
-         * @param {MessageEvent} evt
-         */
-        synthNode.port.onmessage = evt => {
-          const { data } = evt;
-          if (typeof data !== 'undefined' && data.type === 'PARAM_CALLBACK' && data.paramIden === paramIden) {
-            synthNode.port.onmessage = null;
-            resolve(data.value);
-          }
-        };
-        postWorkerAction(synthNode, WorkerActionFactory.getState({ param: InvertedParam[paramIden] }));
-      }
-    }
-    catch (ex) {
-      reject(ex);
-    }
-  });
+const dumpParamsSubject = new Subject();
+
+function setupInitState(port$) {
+  initState.synthNodePort$ = port$.pipe(
+    filter(next => next.error === null),
+    map(next => next.message)
+  );
+
+  initState.synthWaveformSubscription = port$.pipe(
+    filter(next => next.error === null),
+    filter(({ message }) => message.data.type === 'WAVEFORM_PUSH'),
+    map(({ message }) => message.data.samples),
+  ).subscribe(samples => waveformSubject.next(samples));
+
+  initState.dumpParamsSubscription = initState.synthNodePort$.pipe(
+    filter(evt => evt.data.type === 'DUMP_PARAMS_CALLBACK'),
+    filter(evt => typeof evt.data.dump !== 'undefined')
+  ).subscribe(samples => dumpParamsSubject.next(samples));
 }
 
 async function getAllParamValues() {
   return await new Promise((resolve, reject) => {
     try {
-      const { synthNode, synthNodePort$ } = initState;
+      const { synthNode } = initState;
       if (synthNode) {
         /**
          * @param {MessageEvent} evt
          */
-        synthNodePort$.pipe(
-          filter(evt => evt.data.type === 'DUMP_PARAMS_CALLBACK'),
-          filter(evt => typeof evt.data.dump !== 'undefined'),
+        dumpParamsSubject.pipe(
           take(1)
         ).subscribe(evt => {
           const { data } = evt;
-          if (typeof data !== 'undefined' && data.type === 'DUMP_PARAMS_CALLBACK' && typeof data.dump !== 'undefined') {
+          if (typeof data !== 'undefined') {
             resolve(data.dump);
+            return;
           }
         });
         postWorkerAction(synthNode, WorkerActionFactory.dumpState());
@@ -170,9 +155,17 @@ export function publishParam(paramIden, state, meta) {
   if (synthNode && typeof state[param] !== 'undefined' && meta.prevState[param] !== state[param]) {
     synthNode.port.postMessage(WorkerActionFactory.setState({ param, value: state[param] }));
     // TODO: replace with forward/inverse param type pairing
-    if (meta.refresh) {
+    if (meta[InvertedMetaParam[MetaParam.refresh]]) {
       synthNode.port.postMessage(WorkerActionFactory.triggerRefresh());
     }
+  }
+}
+
+export function postPresetLine(presetLine) {
+  const { synthNode } = initState;
+  if (synthNode && presetLine) {
+    postWorkerAction(synthNode, WorkerActionFactory.setPreset(presetLine));
+    syncParamsState();
   }
 }
 
@@ -184,7 +177,7 @@ const handleKeyDown = ({ keyCode, oct }) => {
   if (!validateKeyCode(keyCode)) {
     return;
   }
-  postWorkerAction(synthNode, WorkerActionFactory.sendKeyDown({keyCode, oct: oct || 0}));
+  postWorkerAction(synthNode, WorkerActionFactory.sendKeyDown({ keyCode, oct: oct || 0 }));
 };
 
 /**
@@ -222,7 +215,7 @@ const keyUp$ = keyEvents$.pipe(
   map(action => action.payload)
 );
 
-keyUp$.subscribe(({keyCode}) => {
+keyUp$.subscribe(({ keyCode }) => {
   const { synthNode } = initState;
   if (synthNode) {
     // @ts-ignore
@@ -239,13 +232,13 @@ observerSubscribe(store => {
 window.addEventListener('keydown', (evt) => {
   const { synthNode } = initState;
   if (synthNode && !evt.repeat) {
-    store.dispatch(keyDownEvent({keyCode: evt.keyCode, oct: octaveSubject.getValue()}));
+    store.dispatch(keyDownEvent({ keyCode: evt.keyCode, oct: octaveSubject.getValue() }));
   }
 });
 
 window.addEventListener('keyup', (evt) => {
   const { synthNode } = initState;
   if (synthNode && !evt.repeat) {
-    store.dispatch(keyUpEvent({keyCode: evt.keyCode}));
+    store.dispatch(keyUpEvent({ keyCode: evt.keyCode }));
   }
 });

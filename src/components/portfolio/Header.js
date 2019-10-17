@@ -10,7 +10,7 @@ export const Header = ({ resumeData }) => {
           <a className="mobile-btn" href="#" title="Hide navigation">Hide navigation</a>
           <ul id="nav" className="nav">
             <li className="current"><a className="smoothscroll" href="#home">Home</a></li>
-            <li><a className="smoothscroll" href="#demo">Demo</a></li>
+            <li><a className="smoothscroll" href="#demo">Try</a></li>
             <li><a className="smoothscroll" href="#about">About</a></li>
             <li><a className="smoothscroll" href="#tech">Tech</a></li>
             <li><a className="smoothscroll" href="#portfolio">Projects</a></li>

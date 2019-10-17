@@ -2,10 +2,10 @@
 import React, { Component } from 'react';
 import { KeyboardElement } from './common/keyboard_element';
 import { SynthWindow } from '../SynthWindow';
-import { keyEvents$, observerSubscribe } from '../../store';
+import store, { keyEvents$, observerSubscribe } from '../../store';
 import { map, filter } from 'rxjs/operators';
 import { mapKeyCodeToMidi } from '../../common';
-import { EVENT_KEY_DOWN } from '../../redux/actionTypes';
+import { EVENT_KEY_DOWN, EVENT_OCTAVE_INCREMENT } from '../../redux/actionTypes';
 import { Subscription } from 'rxjs';
 import { MetaParam, InvertedMetaParam } from '../../redux/types';
 
@@ -24,11 +24,13 @@ export class ProductDemo extends Component {
     this.state = {
       octave: 0
     };
-    
+
     const octaveSelector = store => store.meta[InvertedMetaParam[MetaParam.kbOctave]] || 0;
     this.observerUnsubscribe = observerSubscribe(store => {
       this.setState({ octave: octaveSelector(store) });
     }, octaveSelector);
+
+    this.handleOctaveIncr = this.handleOctaveIncr.bind(this);
   }
 
   componentDidMount() {
@@ -59,6 +61,13 @@ export class ProductDemo extends Component {
     this.keyboardInterface.resize();
   }
 
+  handleOctaveIncr(incrAmount) {
+    store.dispatch({
+      type: EVENT_OCTAVE_INCREMENT,
+      payload: incrAmount
+    });
+  }
+
   render() {
     return (
       <section id="demo">
@@ -67,8 +76,13 @@ export class ProductDemo extends Component {
           <div className="keyboard-container">
             <div id="keyboard" ref={this.containerRef} />
           </div>
+          <div className="kb-label">
+            <span className="kb-label--text">PC Keyboard Controls:</span>
+          </div>
           <div className="octave-container">
+            <span className="octave-btn" onClick={() => this.handleOctaveIncr(-1)}>DOWN</span>
             <span className="octave">OCTAVE: {this.state.octave >= 0 ? '+' : ''}{this.state.octave}</span>
+            <span className="octave-btn" onClick={() => this.handleOctaveIncr(+1)}>UP</span>
           </div>
         </div>
       </section>

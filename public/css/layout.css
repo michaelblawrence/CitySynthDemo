@@ -262,6 +262,10 @@ ul#nav li.current a {
    overflow: hidden;
 }
 
+#demo {
+   padding-bottom: 0px;
+}
+
 #about a, #about a:visited, #tech a, #tech a:visited {
    color: #fff;
 }
@@ -337,16 +341,20 @@ ul#nav li.current a {
 }
 
 .row.keys {
-   margin-top: 40px;
-   background-color: #2f2f2f;
-   padding: 10px;
+   margin: 25px auto;
+   background-color: #1a1a1a;
+   padding: 30px 10px 20px;
+   padding-bottom: 20px;
+   border-radius: 5px;
+   width: 400px;
+   box-shadow: #242424 0px 4px 4px;
 }
 
 .keyboard-container {
    overflow: hidden;
    width: 275px;
-   height: 125px;
-   margin: 20px auto 5px;
+   height: 126px;
+   margin: 5px auto;
    box-shadow: 0px 2px 2px #292929;
 }
 
@@ -356,7 +364,7 @@ ul#nav li.current a {
    transform: translate(0, 0);
    /* width: calc(100% - 20px); */
    width: 1300px;
-   height: 130px;
+   height: 131px;
 }
 
 #keyboard .key {
@@ -380,7 +388,7 @@ ul#nav li.current a {
 }
 
 #keyboard .key.black .fill {
-   background-color: #4e4e4e;
+   background-color: #272626;
    width: calc(100% - 8px);
    left: 4px
 }
@@ -394,7 +402,7 @@ ul#nav li.current a {
 }
 
 #keyboard .key .fill {
-   border: 1px solid #212121;
+   border: 1px solid #151717;
    position: absolute;
    top: 0;
    left: 0;
@@ -402,6 +410,10 @@ ul#nav li.current a {
    height: 100%;
    pointer-events: none;
    transition: background-color 0.6s;
+}
+
+#keyboard .key:hover .fill {
+   background-color: #484643;
 }
 
 #keyboard .key .fill.active {
@@ -417,18 +429,51 @@ ul#nav li.current a {
    background-color: #fff
 }
 
+.kb-label {
+   margin: 16px 0px 4px;
+   text-align: center;
+   color: #94918d66;
+}
+
 .octave-container {
    width: 100%;
+   display: flex;
+   justify-content: center;
+   align-items: center;
 }
 
 .octave {
    width: 100px;
-   margin: 0 auto;
-   display: block;
+   /* margin: 0 auto; */
+   display: inline-block;
    color: #949494;
    text-transform: capitalize;
    text-align: center;
    font-weight: 400;
+   user-select: none;
+   font-size: 1.1em;
+   line-height: 40px;
+}
+
+.octave-btn {
+   flex: auto 0 0;
+   width: 60px;
+   padding: 5px 10px;
+   margin: 0 20px;
+   font-size: 0.8em;
+   height: 30px;
+   line-height: 20px;
+   text-align: center;
+   color: #6f6556;
+   background-color: #272626;
+   user-select: none;
+   cursor: pointer;
+   transition: background-colour, color ease 0.1s;
+}
+
+.octave-btn:hover {
+   color: #a56827;
+   background-color: #1d1d1d;
 }
 
 .row--synth {

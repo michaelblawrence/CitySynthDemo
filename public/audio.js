@@ -116,7 +116,10 @@ function loadPreset(data) {
   if (synth && typeof data === 'string') {
     console.warn('changing from current preset.. ' + synth.print('preset name: '));
     console.log(`synth.load_preset(line = ${data});`);
-    synth.load_preset(data);
+    const result = synth.load_preset(data);
+    if (result) {
+      console.error(result);
+    }
   }
 }
 
@@ -171,6 +174,7 @@ function dumpAllParam(data, port) {
   if (synth && dumpAll === true) {
     const values = paramIdens.map(item => ({ ...item, value: synth.get_state(item.paramIden) }));
     const dump = values.reduce((dict, kvp) => ({ ...dict, [kvp.param]: kvp.value }), {});
+    console.table(values);
     port.postMessage({ type: 'DUMP_PARAMS_CALLBACK', dump });
     return dump;
   }
