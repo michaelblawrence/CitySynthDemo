@@ -74,7 +74,7 @@ const contentData = {
       'name': 'CitySynth Online',
       'description': 'This website is also open source, complete with the live demo of CitySynth Online',
       'href': 'https://github.com/michaelblawrence/CitySynthDemo',
-      'imgurl': 'images/this-is-city-synth1.png'
+      'imgurl': 'images/this-is-city-synth.png'
     },
     {
       'name': 'learnr',

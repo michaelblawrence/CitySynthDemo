@@ -9,7 +9,7 @@ export class ProductAbout extends Component {
         <div className="row">
           <div className="four columns">
 
-            <img className="tech-logo" src="images/cropped-osc-panel1.png" alt="CitySynth in action" />
+            <img className="tech-logo" src="images/cropped-osc-panel.png" alt="CitySynth in action" />
 
           </div>
 
