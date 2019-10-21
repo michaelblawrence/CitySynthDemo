@@ -1,7 +1,6 @@
 import React from 'react';
-import { Header, Footer, Portfolio, ProductAbout, TechStackAbout } from './components';
+import { Header, Footer, Portfolio, ProductAbout, ProductDemo, TechStackAbout } from './components';
 import contentData from './contentData';
-import { ProductDemo } from './components/portfolio/Demo';
 
 const App = () => {
   return (
