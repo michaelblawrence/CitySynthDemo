@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 export class Testimonials extends Component {
   render() {
-    let resumeData = this.props.resumeData;
+    let contentData = this.props.contentData;
     return (
       <section id="testimonials">
         <div className="text-container">
@@ -13,7 +13,7 @@ export class Testimonials extends Component {
               <div className="flexslider">
                 <ul className="slides">
                   {
-                    resumeData.testimonials && resumeData.testimonials.map((item)=>{
+                    contentData.testimonials && contentData.testimonials.map((item)=>{
                       return(
                         <li>
                           <blockquote>

@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-export const Header = ({ resumeData }) => {
+export const Header = ({ contentData }) => {
   return (
     <React.Fragment>
 
@@ -19,19 +19,19 @@ export const Header = ({ resumeData }) => {
 
         <div className="row banner">
           <div className="banner-text">
-            <h1 className="responsive-headline">This is {resumeData.productName}.</h1>
+            <h1 className="responsive-headline">This is {contentData.productName}.</h1>
             <h3 style={{ color: '#fff', fontFamily: 'sans-serif ' }}>
               <span className="banner-tagline">
-                {resumeData.productRole}
+                {contentData.productRole}
               </span>
               <span className="banner-description">
-                {resumeData.productDescription}
+                {contentData.productDescription}
               </span>
             </h3>
             <hr />
             <ul className="social">
               {
-                resumeData.socialLinks && resumeData.socialLinks.map(item => (
+                contentData.socialLinks && contentData.socialLinks.map(item => (
                   <li key={item.name}>
                     <a href={item.url} target="_blank" rel="noopener noreferrer"><i className={item.className}></i></a>
                   </li>
@@ -52,5 +52,5 @@ export const Header = ({ resumeData }) => {
 };
 
 Header.propTypes = {
-  resumeData: PropTypes.object,
+  contentData: PropTypes.object,
 };

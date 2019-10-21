@@ -1,14 +1,14 @@
 import React, { Component } from 'react';
 export class Footer extends Component {
   render() {
-    let resumeData = this.props.resumeData;
+    let contentData = this.props.contentData;
     return (
       <footer>
       <div className="row">
         <div className="twelve columns">
           <ul className="social-links">
             {
-              resumeData.socialLinks && resumeData.socialLinks.map((item)=>{
+              contentData.socialLinks && contentData.socialLinks.map((item)=>{
                 return(
                   <li>
                     <a href={item.url}>

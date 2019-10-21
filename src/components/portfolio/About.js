@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 
 export class ProductAbout extends Component {
   render() {
-    let resumeData = this.props.resumeData;
+    let contentData = this.props.contentData;
     return (
       <section id={'about'}>
         <div className="row">
@@ -18,7 +18,7 @@ export class ProductAbout extends Component {
             <h2>CitySynth</h2>
             <p>
               {
-                resumeData.productAbout
+                contentData.productAbout
               }
             </p>
 
@@ -28,7 +28,7 @@ export class ProductAbout extends Component {
 
                 <h2>Features</h2>
                 <p className="features">
-                  {resumeData.productFeatures.map(entry => (
+                  {contentData.productFeatures.map(entry => (
                     <span key={entry}>{entry}</span>))}
                 </p>
               </div>
@@ -41,7 +41,7 @@ export class ProductAbout extends Component {
 }
 export class TechStackAbout extends Component {
   render() {
-    let resumeData = this.props.resumeData;
+    let contentData = this.props.contentData;
     return (
       <section id={'tech'}>
         <div className="row">
@@ -51,7 +51,7 @@ export class TechStackAbout extends Component {
             <h2>How it works</h2>
             <p>
               {
-                resumeData.prodectTech
+                contentData.prodectTech
               }
             </p>
 
@@ -61,13 +61,13 @@ export class TechStackAbout extends Component {
 
                 <h2>Contact Details</h2>
                 <p className="address">
-                  <span>{resumeData.name}</span>
+                  <span>{contentData.name}</span>
                   <br></br>
                   <span>
-                    {resumeData.address}
+                    {contentData.address}
                   </span>
                   <br></br>
-                  <span>{resumeData.website}</span>
+                  <span>{contentData.website}</span>
                 </p>
               </div> */}
             </div>
