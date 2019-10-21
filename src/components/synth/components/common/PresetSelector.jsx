@@ -100,8 +100,8 @@ const PresetSelectorDropdown = ({ visible, onChangePreset, handleEvent, presetIt
     if (selIdx !== selectedIndex) {
       if (selIdx < scrollIdx.min && selIdx >= 0) {
         setScrolledRows(selIdx);
-      } else if (selIdx >= scrollIdx.max && selIdx < presetItems.length - DropdownMaxRows) {
-        setScrolledRows(selIdx - DropdownMaxRows + 1);
+      } else if (selIdx >= scrollIdx.max) {
+        setScrolledRows(Math.min(selIdx - DropdownMaxRows + 1, presetItems.length - DropdownMaxRows));
       }
     }
     setIndex(selIdx);
@@ -155,7 +155,9 @@ const PresetSelectorDropdown = ({ visible, onChangePreset, handleEvent, presetIt
     });
 
   const scrollOffsetX = bg_w - 6 - scrbg_w;
-  const scrollOffsetY = bg_h + 5 + scrolledRows;
+  const scrollOffsetY = bg_h + 5;
+
+  const scrollAmt = Math.floor(140 * scrolledRows / (presetItems.length - listItems.length));
 
   const dropScrollTopH = DropDownScrollbarTop.imgHeightPx;
 
@@ -164,9 +166,9 @@ const PresetSelectorDropdown = ({ visible, onChangePreset, handleEvent, presetIt
       <DropDownBackground x={-1} y={bg_h - 1} />
       {listItems}
       <DropDownScrollBackground x={scrollOffsetX} y={scrollOffsetY} />
-      <DropDownScrollbarTop x={scrollOffsetX} y={scrollOffsetY} />
-      {/* <DropDownScrollbarMid x={scrollOffsetX} y={scrollOffsetY + dropScrollTopH} /> */}
-      <DropDownScrollbarBtm x={scrollOffsetX} y={scrollOffsetY + dropScrollTopH} />
+      <DropDownScrollbarTop x={scrollOffsetX} y={scrollOffsetY + scrollAmt} />
+      {/* <DropDownScrollbarMid x={scrollOffsetX} y={scrollOffsetY + scrollAmt + dropScrollTopH} /> */}
+      <DropDownScrollbarBtm x={scrollOffsetX} y={scrollOffsetY + scrollAmt + dropScrollTopH} />
     </Group>);
 };
 PresetSelectorDropdown.propTypes = {

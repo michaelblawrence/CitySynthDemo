@@ -12,10 +12,9 @@ const WaveBoxBackground = (props) => {
 WaveBoxBackground.imgWidthPx = 178;
 WaveBoxBackground.imgHeightPx = 51;
 
-export const WavePreviewBox = ({ x, y }) => {
+export const WavePreviewBox = ({ x, y, gain }) => {
   const emptyArray = nItems => new Array(nItems).fill(0);
   const [points, setPoints] = useState(emptyArray(128 * 2));
-  const gain = 12;
 
   useEffect(() => {
     const subscription = waveform$.subscribe(samples => {
@@ -43,10 +42,12 @@ WavePreviewBox.propTypes = {
   x: PropTypes.number,
   y: PropTypes.number,
   enabled: PropTypes.bool,
+  gain: PropTypes.number
 };
 
 WavePreviewBox.defaultProps = {
   x: 0,
   y: 0,
   enabled: true,
+  gain: 5
 };
