@@ -9,7 +9,16 @@ import { EVENT_KEY_DOWN, EVENT_OCTAVE_INCREMENT } from '../../redux/actionTypes'
 import { Subscription } from 'rxjs';
 import { MetaParam, InvertedMetaParam } from '../../redux/types';
 
-export class ProductDemo extends Component {
+export const ProductDemo = () => {
+  return (
+    <section id="demo">
+      <SynthWindow />
+      <SynthWindowControls />
+    </section>
+  );
+};
+
+class SynthWindowControls extends Component {
   constructor(props) {
     super(props);
     this.containerRef = React.createRef();
@@ -70,22 +79,19 @@ export class ProductDemo extends Component {
 
   render() {
     return (
-      <section id="demo">
-        <SynthWindow />
-        <div className="row keys">
-          <div className="keyboard-container">
-            <div id="keyboard" ref={this.containerRef} />
-          </div>
-          <div className="kb-label">
-            <span className="kb-label--text">PC Keyboard Controls:</span>
-          </div>
-          <div className="octave-container">
-            <span className="octave-btn" onClick={() => this.handleOctaveIncr(-1)}>DOWN</span>
-            <span className="octave">OCTAVE: {this.state.octave >= 0 ? '+' : ''}{this.state.octave}</span>
-            <span className="octave-btn" onClick={() => this.handleOctaveIncr(+1)}>UP</span>
-          </div>
+      <div className="row keys">
+        <div className="keyboard-container">
+          <div id="keyboard" ref={this.containerRef} />
         </div>
-      </section>
+        <div className="kb-label">
+          <span className="kb-label--text">PC Keyboard Controls:</span>
+        </div>
+        <div className="octave-container">
+          <span className="octave-btn" onClick={() => this.handleOctaveIncr(-1)}>DOWN</span>
+          <span className="octave">OCTAVE: {this.state.octave >= 0 ? '+' : ''}{this.state.octave}</span>
+          <span className="octave-btn" onClick={() => this.handleOctaveIncr(+1)}>UP</span>
+        </div>
+      </div>
     );
   }
 }

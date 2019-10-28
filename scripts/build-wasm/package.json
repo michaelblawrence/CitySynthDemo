@@ -1,0 +1,26 @@
+{
+  "name": "build-wasm",
+  "version": "0.1.0",
+  "description": "",
+  "main": "build-wasm.js",
+  "scripts": {
+    "init-rs": "cargo install wasm-pack",
+    "build-rs": "wasm-pack build ..\\..\\crate -d ..\\bin",
+    "build-rs-offline": "wasm-pack build ..\\..\\crate -d ..\\bin -- --offline",
+    "build-js": "yarn && node build-wasm.js",
+    "build-js-offline": "node build-wasm.js",
+    "build": "yarn && npm run build-rs && npm run build-js",
+    "build-offline": "npm run build-rs-offline && npm run build-js-offline"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@babel/core": "^7.6.4",
+    "babel-plugin-remove-import-export": "^1.1.0",
+    "fast-text-encoding": "^1.0.0",
+    "prettier": "1.18.2"
+  },
+  "dependencies": {
+    "fs": "^0.0.1-security"
+  }
+}

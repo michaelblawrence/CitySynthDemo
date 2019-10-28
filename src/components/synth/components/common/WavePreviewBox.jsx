@@ -13,6 +13,29 @@ WaveBoxBackground.imgWidthPx = 178;
 WaveBoxBackground.imgHeightPx = 51;
 
 export const WavePreviewBox = ({ x, y, gain }) => {
+  return (
+    <Group x={x} y={y}>
+      <WaveBoxBackground />
+      <WavePreviewBoxLine gain={gain} />
+    </Group>
+  );
+};
+
+WavePreviewBox.propTypes = {
+  x: PropTypes.number,
+  y: PropTypes.number,
+  enabled: PropTypes.bool,
+  gain: PropTypes.number
+};
+
+WavePreviewBox.defaultProps = {
+  x: 0,
+  y: 0,
+  enabled: true,
+  gain: 5
+};
+
+const WavePreviewBoxLine = ({ gain }) => {
   const emptyArray = nItems => new Array(nItems).fill(0);
   const [points, setPoints] = useState(emptyArray(128 * 2));
 
@@ -31,23 +54,10 @@ export const WavePreviewBox = ({ x, y, gain }) => {
     return () => subscription.unsubscribe();
   }, [gain]);
   return (
-    <Group x={x} y={y}>
-      <WaveBoxBackground />
-      <Line points={points} strokeWidth={1.5} stroke={'#ffa500'} />
-    </Group>
+    <Line points={points} strokeWidth={1.5} stroke={'#ffa500'} />
   );
 };
 
-WavePreviewBox.propTypes = {
-  x: PropTypes.number,
-  y: PropTypes.number,
-  enabled: PropTypes.bool,
+WavePreviewBoxLine.propTypes = {
   gain: PropTypes.number
-};
-
-WavePreviewBox.defaultProps = {
-  x: 0,
-  y: 0,
-  enabled: true,
-  gain: 5
 };

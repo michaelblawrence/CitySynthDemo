@@ -24,7 +24,7 @@ const OscPanel = () => {
   );
 };
 
-const DelayWetAmountHook = createStoreHook(Param.DelayWet, setParamDelayWetAmt, [0, 1.1 * 100]);
+const DelayWetAmountHook = createStoreHook(Param.DelayWet, setParamDelayWetAmt, [0, 1.1]);
 
 const DelayPanel = () => {
   return (
@@ -37,7 +37,7 @@ const DelayPanel = () => {
   );
 };
 
-const ReverbWetAmountHook = createStoreHook(Param.ReverbWet, setParamReverbWetAmt, [0, 1.1 * 100]);
+const ReverbWetAmountHook = createStoreHook(Param.ReverbWet, setParamReverbWetAmt, [0, 1.1]);
 
 const ReverbPanel = () => {
   return (

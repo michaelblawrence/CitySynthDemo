@@ -123,7 +123,7 @@ ToggleIcon.propTypes = {
   enabled: PropTypes.bool,
   checked: PropTypes.bool,
   onClick: PropTypes.func,
-  children: PropTypes.node.isRequired
+  children: PropTypes.node
 };
 
 ToggleIcon.defaultProps = {

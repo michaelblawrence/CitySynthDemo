@@ -125,8 +125,8 @@ export const ConnectTouchPad = ({ hHook, vHook, hLogScale, vLogScale, ...props }
 };
 
 ConnectTouchPad.propTypes = {
-  hHook: PropTypes.object,
-  vHook: PropTypes.object,
+  hHook: PropTypes.array,
+  vHook: PropTypes.array,
   hLogScale: PropTypes.bool,
   vLogScale: PropTypes.bool,
 };

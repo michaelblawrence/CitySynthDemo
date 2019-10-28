@@ -27,8 +27,8 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "build-wasm-bin": "wasm-pack build .\\crate\\ -d .\\crate\\temp",
-    "build-wasm": "yarn build-wasm-bin",
+    "build-wasm": "yarn --cwd .\\scripts\\build-wasm build",
+    "build-wasm-offline": "yarn --cwd .\\scripts\\build-wasm --offline build-offline",
     "predeploy": "yarn build",
     "deploy": "gh-pages -d build",
     "test": "react-scripts test",

@@ -4,6 +4,14 @@ import PropTypes from 'prop-types';
 import { Image } from 'react-konva';
 import useImage from 'use-image';
 
+const elementCache = {};
+
+const getCacheKey = ({ dir, componentScope, assetName, ext }) =>
+  dir + '|' + componentScope + '|' + assetName + '|' + ext;
+
+const getImageFromSrc = ({ dir, componentScope, assetName, ext }, performNoOp) =>
+  getImage(dir, componentScope, assetName, ext, performNoOp);
+
 /**
  * @param {{
  *  componentScope: string;
@@ -18,7 +26,24 @@ export const AssetImage = (props) => {
   const ext = (typeof assetExt === 'string' && assetExt) || 'png';
   const dir = (typeof resDirector === 'string' && resDirector) || 'synth';
 
-  const [image] = getImage(dir, componentScope, assetName, ext);
+  const assetPath = { dir, componentScope, assetName, ext };
+
+  const cacheKey = getCacheKey(assetPath);
+  const cached = elementCache[cacheKey];
+
+  const performNoOpNetworkAction = typeof cached !== 'undefined';
+  const image = (getImageFromSrc(assetPath, performNoOpNetworkAction) || [])[0] || cached;
+
+  if (!performNoOpNetworkAction && image) {
+    console.info('pulled fresh image for ' + cacheKey, image);
+    elementCache[cacheKey] = image;
+  } else if (performNoOpNetworkAction) {
+    console.debug('using cached for ' + cacheKey, image);
+  }
+  if (performNoOpNetworkAction && !image) {
+    console.error('used cached for ' + cacheKey + ' but image was undefined', image);
+  }
+
   const imageRef = React.useRef();
 
   /** @type {Image} */
@@ -50,8 +75,10 @@ AssetImage.propTypes = {
  * @param {string} assetName
  * @param {string} ext
  */
-function getImage(dir, componentScope, assetName, ext) {
-  return useImage(`${process.env.PUBLIC_URL}/res/${dir}/assets.${componentScope}/${assetName}.${ext}`);
+function getImage(dir, componentScope, assetName, ext, performNoOp) {
+  // eslint-disable-next-line no-undef
+  const url = `${process.env.PUBLIC_URL}/res/${dir}/assets.${componentScope}/${assetName}.${ext}`;
+  return useImage(performNoOp ? null : url);
 }
 
 

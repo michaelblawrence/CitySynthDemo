@@ -153,10 +153,10 @@ export function publishParam(paramIden, state, meta) {
   const param = InvertedParam[paramIden];
   const { synthNode } = initState;
   if (synthNode && typeof state[param] !== 'undefined' && meta.prevState[param] !== state[param]) {
-    synthNode.port.postMessage(WorkerActionFactory.setState({ param, value: state[param] }));
+    postWorkerAction(synthNode, WorkerActionFactory.setState({ param, value: state[param] }));
     // TODO: replace with forward/inverse param type pairing
     if (meta[InvertedMetaParam[MetaParam.refresh]]) {
-      synthNode.port.postMessage(WorkerActionFactory.triggerRefresh());
+      postWorkerAction(synthNode, WorkerActionFactory.triggerRefresh());
     }
   }
 }
@@ -165,6 +165,7 @@ export function postPresetLine(presetLine) {
   const { synthNode } = initState;
   if (synthNode && presetLine) {
     postWorkerAction(synthNode, WorkerActionFactory.setPreset(presetLine));
+    postWorkerAction(synthNode, WorkerActionFactory.triggerRefresh());
     syncParamsState();
   }
 }
