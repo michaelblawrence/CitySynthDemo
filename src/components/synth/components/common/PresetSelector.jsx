@@ -5,6 +5,7 @@ import { AssetImage } from '../features';
 import { Group, Line, Rect } from 'react-konva';
 import { HeaderText } from './HeaderText';
 import { postPresetLine } from '../../../../workerActions';
+import { clampNumber } from '../../../../common';
 
 const SelectorBackground = (props) => {
   return <AssetImage componentScope={'PresetSelector'} assetName={'base-sel-bar-bg'} {...props} />;
@@ -67,8 +68,8 @@ const PresetEventType = {
 };
 
 const PresetSelectorBar = ({ onToggleDropDown, presetText, handleEvent }) => {
-  const onUpButtonClick = handleEvent(PresetEventType.UP_BUTTON_PRESSED);
-  const onDownButtonClick = handleEvent(PresetEventType.DOWN_BUTTON_PRESSED);
+  const onUpButtonClick = () => handleEvent(PresetEventType.UP_BUTTON_PRESSED);
+  const onDownButtonClick = () => handleEvent(PresetEventType.DOWN_BUTTON_PRESSED);
   return (
     <Group>
       <SelectorBackground onMouseDown={onToggleDropDown} />
@@ -107,7 +108,13 @@ const PresetSelectorDropdown = ({ visible, onChangePreset, handleEvent, presetIt
     setIndex(selIdx);
   }, [selIdx]);
 
-  const itemTxtColour = (idx) => idx == selectedIndex ? txtSelectedColour : txtColour;
+  const onScroll = nextScrolledRows => {
+    if (nextScrolledRows !== scrolledRows) {
+      setScrolledRows(nextScrolledRows);
+    }
+  };
+
+  const itemTxtColour = (idx) => idx === selectedIndex ? txtSelectedColour : txtColour;
 
   const listItemWidth = 242;
   const listItemHeight = 20.4;
@@ -157,19 +164,59 @@ const PresetSelectorDropdown = ({ visible, onChangePreset, handleEvent, presetIt
   const scrollOffsetX = bg_w - 6 - scrbg_w;
   const scrollOffsetY = bg_h + 5;
 
-  const scrollAmt = Math.floor(140 * scrolledRows / (presetItems.length - listItems.length));
-
-  const dropScrollTopH = DropDownScrollbarTop.imgHeightPx;
-
   return visible && (
     <Group>
       <DropDownBackground x={-1} y={bg_h - 1} />
       {listItems}
       <DropDownScrollBackground x={scrollOffsetX} y={scrollOffsetY} />
-      <DropDownScrollbarTop x={scrollOffsetX} y={scrollOffsetY + scrollAmt} />
-      {/* <DropDownScrollbarMid x={scrollOffsetX} y={scrollOffsetY + scrollAmt + dropScrollTopH} /> */}
-      <DropDownScrollbarBtm x={scrollOffsetX} y={scrollOffsetY + scrollAmt + dropScrollTopH} />
+      <DropDownScrollbar scrolledRows={scrolledRows} scrolledRowsChanged={onScroll} itemsCount={presetItems.length} slicedCount={listItems.length} />
     </Group>);
+};
+
+const DropDownScrollbar = ({ scrolledRows, scrolledRowsChanged, itemsCount, slicedCount }) => {
+  const scrollOffsetX = bg_w - 6 - scrbg_w;
+  const scrollOffsetY = bg_h + 5;
+  const dropScrollTopH = DropDownScrollbarTop.imgHeightPx;
+
+  const scrollAmtMax = 140;
+  const scrollAmtCalc = _scrolledRows => Math.floor(scrollAmtMax * _scrolledRows / (itemsCount - slicedCount));
+  const scrollRowsCalc = y => Math.round(clampNumber(y, scrollAmtMax, 0) * (itemsCount - slicedCount) / scrollAmtMax);
+  const [scrollAmt, setScrollAmt] = useState(scrollAmtCalc(scrolledRows));
+
+  useEffect(() => {
+    setScrollAmt(scrollAmtCalc(scrolledRows));
+  }, [scrolledRows]);
+
+  /**
+   * @param {import('konva/types/Node').KonvaEventObject<DragEvent>} evt
+   */
+  const onDragMove = evt => {
+    const targetY = evt.target.y();
+
+    evt.target.x(0);
+    evt.target.y(clampNumber(targetY, scrollAmtMax, 0));
+    
+    const calcScrollRows = scrollRowsCalc(targetY);
+    if (calcScrollRows !== scrolledRows) {
+      scrolledRowsChanged(calcScrollRows);
+    }
+  };
+
+  /**
+   * @param {import('konva/types/Node').KonvaEventObject<DragEvent>} evt
+   */
+  const onDragEnd = evt => {
+    const calcScrollRows = scrollRowsCalc(evt.target.y());
+    setScrollAmt(scrollAmtCalc(calcScrollRows));
+  };
+
+  return (
+    <Group y={scrollAmt} draggable={true} onDragMove={onDragMove} onDragEnd={onDragEnd}>
+      <DropDownScrollbarTop x={scrollOffsetX} y={scrollOffsetY} />
+      {/* <DropDownScrollbarMid x={scrollOffsetX} y={scrollOffsetY + scrollAmt + dropScrollTopH} /> */}
+      <DropDownScrollbarBtm x={scrollOffsetX} y={scrollOffsetY + dropScrollTopH} />
+    </Group>
+  );
 };
 PresetSelectorDropdown.propTypes = {
   visible: PropTypes.bool,
@@ -216,7 +263,8 @@ export const PresetSelector = ({ x, y }) => {
   const [presetArray, updatePresetArray] = useState([]);
   const initialPresetIdx = 0;
 
-  const handlePresetName = ({ presetName, idx }) => setPreset({ name: presetName, idx });
+  const [selectedPreset, setPreset] = useState({ presetName: 'Initial', idx: 0 });
+  const handlePresetName = ({ presetName, idx }) => setPreset({ presetName, idx });
 
   useEffect(() => {
     tempPresetsPromise
@@ -225,24 +273,23 @@ export const PresetSelector = ({ x, y }) => {
         const presetArray = parsePresetLines(text);
         const initialPresetName = parsePresetName(presetArray, initialPresetIdx);
         updatePresetArray(presetArray);
-        handlePresetName({presetName: initialPresetName, idx: initialPresetIdx});
-        handleEvent(PresetEventType.RELOAD_PRESET);
+        handlePresetName({ presetName: initialPresetName, idx: initialPresetIdx });
+        // handleEvent(PresetEventType.RELOAD_PRESET);
       });
   }, []);
-  const [selectedPreset, setPreset] = useState({ name: 'Inital', idx: 0 });
 
-  const presetCount = presetArray.length;
 
 
   const shiftPreset = (shiftAmount) => {
+    const presetCount = presetArray.length;
     const idx = (selectedPreset.idx + shiftAmount + presetCount) % presetCount;
-    return { name: parsePresetName(presetArray, idx), idx };
+    return { presetName: parsePresetName(presetArray, idx), idx };
   };
 
   /**
    * @param {string} [presetEventType]
    */
-  const handleEvent = presetEventType => evt => {
+  const handleEvent = presetEventType => {
     let newPreset = selectedPreset;
     switch (presetEventType) {
       case PresetEventType.UP_BUTTON_PRESSED:
@@ -256,9 +303,11 @@ export const PresetSelector = ({ x, y }) => {
         postPresetLine(presetArray[newPreset.idx]);
         break;
       case PresetEventType.RELOAD_PRESET:
-        newPreset = shiftPreset(0);
-        setPreset(newPreset);
-        postPresetLine(presetArray[newPreset.idx]);
+        // newPreset = shiftPreset(0);
+        // setPreset(newPreset);
+        postPresetLine(presetArray[selectedPreset.idx]);
+        break;
+      default:
         break;
     }
   };
@@ -267,7 +316,7 @@ export const PresetSelector = ({ x, y }) => {
     <Group x={x} y={y}>
       <PresetSelectorBar
         onToggleDropDown={toggleDropDown}
-        presetText={selectedPreset.name}
+        presetText={selectedPreset.presetName}
         handleEvent={handleEvent}
       />
       <PresetSelectorDropdown
