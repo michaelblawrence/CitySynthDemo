@@ -23,7 +23,8 @@ impl CitySynth {
         loader::load_defaults(&mut bucket);
 
         let sample_rate = sample_rate.unwrap_or(DEFAULT_SAMPLE_RATE);
-        let (synth, events_handler) = PolySynth::new(sample_rate, voices_count, bucket.clone());
+        let (mut synth, events_handler) = PolySynth::new(sample_rate, voices_count, bucket.clone());
+        synth.dverb_active = false;
 
         Self {
             poly: synth,
@@ -48,10 +49,8 @@ impl CitySynth {
         PolySynth::note_off(&mut self.events, key_code as u8);
     }
 
-    pub fn set_freq(&mut self, freq: f64) -> f64 {
-        let old_value = self.poly.state().get(R::Frequency);
-        self.bucket.set(R::Frequency, freq);
-        old_value
+    pub fn set_delay_reverb_active(&mut self, active: bool) {
+        self.poly.dverb_active = active;
     }
 
     pub fn get_state(&self, key: Param) -> f64 {
