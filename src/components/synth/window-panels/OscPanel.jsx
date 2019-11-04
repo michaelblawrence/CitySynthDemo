@@ -7,7 +7,7 @@ import store from '../../../store';
 import { createStoreHook } from '../../../redux/actions/helper';
 import { Param } from '../../../redux/types';
 
-const OscPhaseHook = createStoreHook(Param.PitchmodWidth, setParamOscPhase, [0, 1]);
+const OscPhaseHook = createStoreHook(Param.HarmonicPhase, setParamOscPhase, [0, 1]);
 const OscWaveSelectorHook = createStoreHook(Param.WFunction, setParamOscWaveFunction, [0, 5]);
 const OscGainHook = createStoreHook(Param.Gain, setParamOscGain, [0, 1]);
 
