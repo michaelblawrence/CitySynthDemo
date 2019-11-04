@@ -1,7 +1,7 @@
 /* eslint-disable react/prop-types */
-import React, { Component, useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { Group, Ellipse } from 'react-konva';
+import { Group, Ellipse, Rect } from 'react-konva';
 import { AssetImage } from '../features';
 import { HeaderText } from './HeaderText';
 import { rgbaToHexCode, clampNumber } from '../../../../common';
@@ -62,159 +62,119 @@ DialStandbyOverlay.defaultProps = {
   y: 0,
 };
 
-export class Dial extends Component {
-  state = {
-    text: 'Param',
-    value: 0,
-    inactive: true,
-    mouseDown: false,
-  };
+//@ts-check
 
-  constructor(props) {
-    super(props);
+export const Dial = ({ text: propText, children, w, h, value: propValue, valueChanged, onValidateValue, x, y, hideBackground, noInactive }) => {
 
-    const { text, w, h, value, children } = props;
+  const [value, setValue] = useState(propValue);
+  const [rectY, setRectY] = useState(0);
+  const [isInactive, setInactive] = useState(!noInactive);
 
-    this.w = w || 57;
-    this.h = h || 68;
+  const text = children || propText;
 
-    this.state.value = typeof value === 'number' ? value : this.state.value;
+  useEffect(() => {
+    setValue(propValue);
+  }, [propValue]);
 
-    this.state.text = typeof (text) === 'string'
-      ? text
-      : (typeof children === 'string' && children) || this.state.text;
-
-    this.offsetY = 0;
-
-    this.handleDragStart = this.handleDragStart.bind(this);
-    this.handleDragEnd = this.handleDragEnd.bind(this);
-    this.handleDragMove = this.handleDragMove.bind(this);
-    this.handleScroll = this.handleScroll.bind(this);
-  }
-
-  componentDidUpdate(prevProps) {
-    const { value } = this.props;
-    if (prevProps.value !== value) {
-      this.setState({ value });
-    }
-  }
-
-  /**
-   * @param {{evt: DragEvent}} evt 
-   */
-  handleDragMove({ evt }) {
-    // @ts-check
-    if (evt.which !== 1) {
-      this.setState({ mouseDown: false });
-      return;
-    }
-    if (!this.state.mouseDown) {
-      return;
-    }
-    
-    const offsetY = evt.offsetY;
-    const dy = this.offsetY - offsetY;
-    this.offsetY = offsetY;
-
-    this.incrementStateValue(dy);
-
-    evt.stopImmediatePropagation && evt.stopImmediatePropagation();
-  }
-
-  incrementStateValue(dy) {
-    this.setState(state => {
-      const nextValue = Math.round(state.value * 1000 + dy * 10) * 0.001;
-      this.props.valueChanged
-        && state.value !== nextValue
+  const incrementStateValue = (dy) => {
+    setValue((oldValue) => {
+      const nextValue = Math.round(oldValue * 1000 + dy * 10) * 0.001;
+      valueChanged
+        && oldValue !== nextValue
         && nextValue >= 0
         && nextValue <= 1
-        && this.props.valueChanged(clampNumber(nextValue));
-      return {
-        value: clampNumber(nextValue),
-      };
+        && valueChanged(clampNumber(nextValue));
+      return clampNumber(nextValue);
     });
-  }
-
-  /**
-   * @param {{evt: DragEvent}} evt 
-   */
-  handleDragStart({ evt }) {
-    this.offsetY = evt.offsetY;
-    this.setState({ mouseDown: true, inactive: false });
-  }
-
-  /**
-   * @param {{evt: DragEvent}} evt 
-   */
-  handleDragEnd() {
-    if (!this.state.mouseDown) {
-      return;
-    }
-    this.props.valueChanged
-      && this.props.valueChanged(clampNumber(this.state.value), true);
-    typeof this.props.onValidateValue === 'function'
-      && this.props.onValidateValue(this.state.value);
-    console.warn('fired mouse up evt');
-  }
+  };
 
   /**
    * @param {{evt: WheelEvent}} 
    */
-  handleScroll({evt}) {
+  const handleScroll = ({ evt }) => {
     evt.stopPropagation(); evt.stopImmediatePropagation();
     const nextY = -evt.wheelDeltaY;
 
-    this.incrementStateValue(nextY * 0.5);
-  }
+    incrementStateValue(nextY * 0.5);
+  };
 
-  render() {
-    const { x, y, hideBackground, noInactive } = this.props;
-    const img_w = BackgroundImage.imgWidthPx;
-    const bg_y = this.h - BackgroundImage.imgHeightPx;
-    const rotation = clampNumber(this.state.value) * 274;
-    /**
-     * @param {TouchEvent} ev 
-     */
-    const touchStart = (ev) => this.handleDragStart({ evt: { ...ev.evt, clientY: ev.evt.touches && ev.evt.touches[0].clientY } });
-    /**
-     * @param {TouchEvent} ev 
-     */
-    const touchMove = (ev) => this.handleDragMove({ evt: { ...ev.evt, clientY: ev.evt.touches && ev.evt.touches[0].clientY, which: 1 } });
-    /**
-     * @param {TouchEvent} ev 
-     */
-    const touchEnd = (ev) => this.handleDragEnd({ evt: { ...ev.evt, clientY: ev.evt.touches && ev.evt.touches[0].clientY, which: 1 } });
-    return (
-      <Group x={x} y={y}
-        onMouseDown={this.handleDragStart}
-        onMouseMove={this.handleDragMove}
-        onMouseUp={this.handleDragEnd}
-        onWheel={this.handleScroll}
-        onTouchStart={touchStart}
-        onTouchMove={touchMove}
-        onTouchEnd={touchEnd}
-      >
-        {hideBackground ? null : <BackgroundImage x={0} y={bg_y} />}
-        <RoundDialImage x={0} y={bg_y} onMouseDown={this.handleDragStart} onMouseMove={this.handleDragMove} />
-        <HeaderText
-          x={0}
-          y={2}
-          centered={true}
-          fillColour={{ r: 255, g: 255, b: 255, a: 255 }}
-          width={this.w}
-          height={this.h - 50}
-        >{this.state.text}</HeaderText>
-        {
-          this.state.inactive && !noInactive
-            ? <DialStandbyOverlay y={bg_y} onClick={() => this.setState(() => ({ inactive: false }))} />
-            : null
-        }
-        <DialMarkerImage x={37 - img_w / 2} y={bg_y + 20} rotation={rotation} />
-        {/* <Rect fill="rgba(0.1, 0.1, 0.1, 0.5)" width={this.w} height={this.h} /> */}
-      </Group>
-    );
-  }
-}
+  /**
+   * @param {import('konva/types/Node').KonvaEventObject<DragEvent>} evt 
+   */
+  const handleDragRectMove = (evt) => {
+    // @ts-check
+    const nextRectY = evt.target.y();
+    const dy = rectY === null ? 0 : rectY - nextRectY;
+    setRectY(nextRectY);
+
+    incrementStateValue(dy);
+  };
+
+  const handleDragRectStart = () => {
+    // @ts-check
+    setRectY(null);
+  };
+
+  /**
+   * @param {import('konva/types/Node').KonvaEventObject<DragEvent>} evt 
+   */
+  const handleDragRectEnd = (evt) => {
+    // @ts-check
+    evt.target.x(0);
+    evt.target.y(0);
+
+    typeof onValidateValue === 'function'
+      && onValidateValue(value);
+    console.warn('fired mouse up evt');
+  };
+
+  const img_w = BackgroundImage.imgWidthPx;
+  const bg_y = h - BackgroundImage.imgHeightPx;
+  const rotation = (clampNumber(value) || 0) * 274;
+  // console.warn({ value, rotation })
+  return (
+    <Group x={x} y={y}
+      onWheel={handleScroll}
+    >
+      <DialBackground w={w} h={h} hideBackground={hideBackground} text={text} isInactive={isInactive}
+        noInactive={noInactive} setInactive={setInactive} />
+      <DialMarkerImage x={37 - img_w / 2} y={bg_y + 20} rotation={rotation} />
+      <Rect fill="rgba(0.1, 0.1, 0.1, 0.5)" width={w} height={h} draggable={true}
+        onDragStart={handleDragRectStart}
+        onDragMove={handleDragRectMove}
+        onDragEnd={handleDragRectEnd} />
+    </Group>
+  );
+};
+const DialBackground = ({ w, h, hideBackground, text, isInactive, noInactive, setInactive }) => {
+  const bg_y = h - BackgroundImage.imgHeightPx;
+  return [
+    hideBackground ? null : <BackgroundImage x={0} y={bg_y} key={'bg_1'} />,
+    <RoundDialImage x={0} y={bg_y} key={'bg_2'} />,
+    <HeaderText
+      x={0}
+      y={2}
+      centered={true}
+      fillColour={{ r: 255, g: 255, b: 255, a: 255 }}
+      width={w}
+      height={h - 50}
+      key={'bg_3'}
+    >{text}</HeaderText>,
+    isInactive && !noInactive
+      ? <DialStandbyOverlay y={bg_y} onClick={() => setInactive(false)} key={'bg_4'} />
+      : null
+  ];
+};
+DialBackground.propTypes = {
+  w: PropTypes.number,
+  h: PropTypes.number,
+  hideBackground: PropTypes.bool,
+  text: PropTypes.string,
+  isInactive: PropTypes.bool,
+  noInactive: PropTypes.bool,
+  setInactive: PropTypes.func
+};
+
 Dial.propTypes = {
   value: PropTypes.number,
   valueChanged: PropTypes.func,
@@ -225,10 +185,14 @@ Dial.propTypes = {
   text: PropTypes.string,
   hideBackground: PropTypes.bool,
   noInactive: PropTypes.bool,
-  children: PropTypes.node.isRequired
 };
 Dial.defaultProps = {
-  value: 0
+  text: 'Param',
+  value: 0,
+  inactive: true,
+  mouseDown: false,
+  w: 57,
+  h: 68,
 };
 export const ConnectLogDial = ({ hook, ...props }) => ConnectHook(hook)(({ value, valueChanged }) => {
   const range = (hook && hook[2]) || [0, 1];
