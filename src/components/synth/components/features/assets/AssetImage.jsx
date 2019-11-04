@@ -35,22 +35,7 @@ export const AssetImage = (props) => {
   const image = (getImageFromSrc(assetPath, performNoOpNetworkAction) || [])[0] || cached;
 
   if (!performNoOpNetworkAction && image) {
-    console.info('pulled fresh image for ' + cacheKey, image);
     elementCache[cacheKey] = image;
-  } else if (performNoOpNetworkAction) {
-    console.debug('using cached for ' + cacheKey, image);
-  }
-  if (performNoOpNetworkAction && !image) {
-    console.error('used cached for ' + cacheKey + ' but image was undefined', image);
-  }
-
-  const imageRef = React.useRef();
-
-  /** @type {Image} */
-  const imgNode = imageRef.current;
-
-  if (imgNode) {
-    // imgNode.rotation(this.imgContainer.rotation() + 90);
   }
 
   if (image) {
@@ -58,7 +43,7 @@ export const AssetImage = (props) => {
     typeof (onInfoReady) === 'function' && onInfoReady(imgInfo);
   }
 
-  return <Image image={image} ref={imageRef} {...others} />;
+  return <Image image={image} {...others} />;
 };
 
 AssetImage.propTypes = {
