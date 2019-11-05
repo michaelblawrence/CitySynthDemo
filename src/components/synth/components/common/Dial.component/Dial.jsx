@@ -1,71 +1,13 @@
 /* eslint-disable react/prop-types */
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { Group, Ellipse, Rect } from 'react-konva';
-import { AssetImage } from '../features';
-import { HeaderText } from './HeaderText';
-import { rgbaToHexCode, clampNumber } from '../../../../common';
-import { ConnectHook } from '../common-core';
-
-const BackgroundImage = (props) => {
-  const { ...other } = props;
-  return <AssetImage componentScope={'Dial'} assetName={'dial-bg-markings'} {...other} />;
-};
-BackgroundImage.imgWidthPx = 57;
-BackgroundImage.imgHeightPx = 65;
-
-const RoundDialImage = (props) => {
-  const { ...other } = props;
-  return <AssetImage componentScope={'Dial'} assetName={'round-blank-dial'} {...other} />;
-};
-RoundDialImage.imgWidthPx = 57;
-RoundDialImage.imgHeightPx = 65;
-
-const DialMarkerImage = (props) => {
-  const { x, y, ...other } = props;
-  const offset = {
-    x: 20,
-    y: 20,
-  };
-  return (
-    <AssetImage componentScope={'Dial'} assetName={'dial-fg-marker'} {...other}
-      x={x + offset.x} y={y + offset.y} offsetX={offset.x} offsetY={offset.y} />
-  );
-};
-DialMarkerImage.imgWidthPx = 39;
-DialMarkerImage.imgHeightPx = 39;
-DialMarkerImage.propTypes = {
-  x: PropTypes.number,
-  y: PropTypes.number,
-};
-
-function DialStandbyOverlay(props) {
-  const { x, y } = props;
-  return (
-    <Ellipse
-      x={x + 56 - BackgroundImage.imgWidthPx / 2.0}
-      y={y + 104 - BackgroundImage.imgHeightPx}
-      width={DialMarkerImage.imgWidthPx}
-      height={DialMarkerImage.imgHeightPx}
-      fill={rgbaToHexCode(45, 45, 45, 190)}
-      onClick={props.onClick}
-    />
-  );
-}
-DialStandbyOverlay.propTypes = {
-  x: PropTypes.number,
-  y: PropTypes.number,
-  onClick: PropTypes.func,
-};
-DialStandbyOverlay.defaultProps = {
-  x: 0,
-  y: 0,
-};
-
-//@ts-check
+import { Group, Rect } from 'react-konva';
+import { clampNumber } from '../../../../../common';
+import { ConnectHook } from '../../common-core';
+import { DialMarkerImage, BackgroundImage } from './Dial.assets';
+import { DialBackground } from './DialBackground';
 
 export const Dial = ({ text: propText, children, w, h, value: propValue, valueChanged, onValidateValue, x, y, hideBackground, noInactive }) => {
-
   const [value, setValue] = useState(propValue);
   const [rectY, setRectY] = useState(0);
   const [isInactive, setInactive] = useState(!noInactive);
@@ -89,11 +31,11 @@ export const Dial = ({ text: propText, children, w, h, value: propValue, valueCh
   };
 
   /**
-   * @param {{evt: WheelEvent}} 
+   * @param {{evt: WheelEvent}} e
    */
   const handleScroll = ({ evt }) => {
     evt.stopPropagation(); evt.stopImmediatePropagation();
-    const nextY = -evt.wheelDeltaY;
+    const nextY = -evt.deltaY;
 
     incrementStateValue(nextY * 0.5);
   };
@@ -125,6 +67,7 @@ export const Dial = ({ text: propText, children, w, h, value: propValue, valueCh
 
     typeof onValidateValue === 'function'
       && onValidateValue(value);
+    // eslint-disable-next-line no-console
     console.warn('fired mouse up evt');
   };
 
@@ -139,40 +82,14 @@ export const Dial = ({ text: propText, children, w, h, value: propValue, valueCh
       <DialBackground w={w} h={h} hideBackground={hideBackground} text={text} isInactive={isInactive}
         noInactive={noInactive} setInactive={setInactive} />
       <DialMarkerImage x={37 - img_w / 2} y={bg_y + 20} rotation={rotation} />
-      <Rect fill="rgba(0.1, 0.1, 0.1, 0.5)" width={w} height={h} draggable={true}
+      <Rect
+        // fill="rgba(0.1, 0.1, 0.1, 0.5)"
+        width={w} height={h} draggable={true}
         onDragStart={handleDragRectStart}
         onDragMove={handleDragRectMove}
         onDragEnd={handleDragRectEnd} />
     </Group>
   );
-};
-const DialBackground = ({ w, h, hideBackground, text, isInactive, noInactive, setInactive }) => {
-  const bg_y = h - BackgroundImage.imgHeightPx;
-  return [
-    hideBackground ? null : <BackgroundImage x={0} y={bg_y} key={'bg_1'} />,
-    <RoundDialImage x={0} y={bg_y} key={'bg_2'} />,
-    <HeaderText
-      x={0}
-      y={2}
-      centered={true}
-      fillColour={{ r: 255, g: 255, b: 255, a: 255 }}
-      width={w}
-      height={h - 50}
-      key={'bg_3'}
-    >{text}</HeaderText>,
-    isInactive && !noInactive
-      ? <DialStandbyOverlay y={bg_y} onClick={() => setInactive(false)} key={'bg_4'} />
-      : null
-  ];
-};
-DialBackground.propTypes = {
-  w: PropTypes.number,
-  h: PropTypes.number,
-  hideBackground: PropTypes.bool,
-  text: PropTypes.string,
-  isInactive: PropTypes.bool,
-  noInactive: PropTypes.bool,
-  setInactive: PropTypes.func
 };
 
 Dial.propTypes = {
@@ -250,4 +167,5 @@ export const ConnectDial = ({ hook, ...props }) => ConnectHook(hook)(({ value, v
 ConnectDial.propTypes = {
   hook: PropTypes.array,
 };
+
 export default Dial;
