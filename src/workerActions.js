@@ -70,7 +70,9 @@ export async function getWasmModule() {
   if (initState.synthNode) {
     return;
   }
-  const actx = new (window.AudioContext || window['webkitAudioContext'])();
+  // @ts-ignore
+  const AudioContext = window.AudioContext || window.webkitAudioContext;
+  const actx = new AudioContext();
   await actx.audioWorklet.addModule('audio.js');
   const module = await getModule();
   const synthNode = new AudioWorkletNode(actx, 'city-rust');
@@ -123,16 +125,11 @@ async function getAllParamValues() {
     try {
       const { synthNode } = initState;
       if (synthNode) {
-        /**
-         * @param {MessageEvent} evt
-         */
         dumpParamsSubject.pipe(
           take(1)
-        ).subscribe(evt => {
-          const { data } = evt;
+        ).subscribe(({ data }) => {
           if (typeof data !== 'undefined') {
             resolve(data.dump);
-            return;
           }
         });
         postWorkerAction(synthNode, WorkerActionFactory.dumpState());
@@ -161,12 +158,12 @@ export function publishParam(paramIden, state, meta) {
   }
 }
 
-export function postPresetLine(presetLine) {
+export async function postPresetLine(presetLine) {
   const { synthNode } = initState;
   if (synthNode && presetLine) {
     postWorkerAction(synthNode, WorkerActionFactory.setPreset(presetLine));
     postWorkerAction(synthNode, WorkerActionFactory.triggerRefresh());
-    syncParamsState();
+    await syncParamsState();
   }
 }
 

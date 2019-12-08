@@ -90,6 +90,8 @@ function MasterReducer(action, state) {
       return getParamSetter(state, action, Param.LPFmodrate);
     case types.SET_PARAM_FILTER_LFO_WIDTH:
       return getParamSetter(state, action, Param.LPFwidth);
+    case types.SET_PARAM_MASTER_LEVEL:
+      return getParamSetter(state, action, Param.Gain);
     default:
       return state;
   }
@@ -102,7 +104,7 @@ function OscReducer(action, state) {
     case types.SET_PARAM_OSC_WAVEFUNCTION:
       return getParamSetter(state, action, Param.WFunction);
     case types.SET_PARAM_OSC_GAIN:
-      return getParamSetter(state, action, Param.Gain);
+      return getParamSetter(state, action, Param.GeneralAtten);
     case types.SET_PARAM_DELAY_WET:
       return getParamSetter(state, action, Param.DelayWet);
     case types.SET_PARAM_REVERB_LENGTH:

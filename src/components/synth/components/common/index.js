@@ -2,6 +2,7 @@ export * from './BaseWindow';
 export * from './Dial.component/Dial';
 export * from './Dial.component/ConnectDial';
 export * from './Dial.component/ConnectLogDial';
+export * from './Dial.component/ConnectSnappyDial';
 export * from './Dial.component/ReduxDial';
 export * from './HeaderText';
 export * from './PresetSelector.component/PresetSelector';

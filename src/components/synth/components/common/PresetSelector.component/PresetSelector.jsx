@@ -43,7 +43,8 @@ export const PresetSelector = ({ x, y }) => {
   const initialPresetIdx = 0;
 
   const [selectedPreset, setPreset] = useState({ presetName: 'Initial', idx: 0 });
-  const handlePresetName = ({ presetName, idx }) => setPreset({ presetName, idx });
+  const handlePresetNameAndPush = async ({ presetName, idx }) =>
+    await new Promise(ok => setPreset(() => { ok(); return { presetName, idx }}));
 
   useEffect(() => {
     tempPresetsPromise
@@ -52,12 +53,14 @@ export const PresetSelector = ({ x, y }) => {
         const presetArray = parsePresetLines(text);
         const initialPresetName = parsePresetName(presetArray, initialPresetIdx);
         updatePresetArray(presetArray);
-        handlePresetName({ presetName: initialPresetName, idx: initialPresetIdx });
-        // handleEvent(PresetEventType.RELOAD_PRESET);
+        return handlePresetNameAndPush({ presetName: initialPresetName, idx: initialPresetIdx });
       });
   }, []);
 
-
+  const handleNewPresetSelection = async ({ presetName, idx }) => {
+    await handlePresetNameAndPush({presetName, idx});
+    await postPresetLine(presetArray[idx]);
+  };
 
   const shiftPreset = (shiftAmount) => {
     const presetCount = presetArray.length;
@@ -68,23 +71,23 @@ export const PresetSelector = ({ x, y }) => {
   /**
    * @param {string} [presetEventType]
    */
-  const handleEvent = presetEventType => {
+  const handleEvent = async (presetEventType) => {
     let newPreset = selectedPreset;
     switch (presetEventType) {
       case PresetEventType.UP_BUTTON_PRESSED:
         newPreset = shiftPreset(-1);
         setPreset(newPreset);
-        postPresetLine(presetArray[newPreset.idx]);
+        await postPresetLine(presetArray[newPreset.idx]);
         break;
       case PresetEventType.DOWN_BUTTON_PRESSED:
         newPreset = shiftPreset(+1);
         setPreset(newPreset);
-        postPresetLine(presetArray[newPreset.idx]);
+        await postPresetLine(presetArray[newPreset.idx]);
         break;
       case PresetEventType.RELOAD_PRESET:
         // newPreset = shiftPreset(0);
         // setPreset(newPreset);
-        postPresetLine(presetArray[selectedPreset.idx]);
+        await postPresetLine(presetArray[newPreset.idx]);
         break;
       default:
         break;
@@ -100,7 +103,7 @@ export const PresetSelector = ({ x, y }) => {
       />
       <PresetSelectorDropdown
         visible={isDropVisible}
-        onChangePreset={handlePresetName}
+        onChangePreset={handleNewPresetSelection}
         selectedIndex={selectedPreset.idx}
         handleEvent={handleEvent}
         presetItems={presetArray.map(line => parsePresetNameFromLine(line))}

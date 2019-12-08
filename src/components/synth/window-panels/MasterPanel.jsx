@@ -1,10 +1,10 @@
 import React from 'react';
 import { Group } from 'react-konva';
-import { HeaderText, Dial, ToggleIcon, PanelDivider, ConnectDial } from '../components';
+import { HeaderText, Dial, ToggleIcon, PanelDivider, ConnectDial, ConnectLogDial } from '../components';
 import { ctOrangeWithOpacity } from '../../../common';
 import { createStoreHook } from '../../../redux/actions/helper';
 import { Param } from '../../../redux/types';
-import { setParamFilterModeWidth, setParamFilterModRate } from '../../../redux/actions/MasterActions';
+import { setParamFilterModeWidth, setParamFilterModRate, setParamMasterLevel } from '../../../redux/actions/MasterActions';
 
 const FilterModRateHook = createStoreHook(Param.LPFmodrate, setParamFilterModRate, [0, 20]);
 const FilterCutoffHook = createStoreHook(Param.LPFwidth, setParamFilterModeWidth, [10, 15000]);
@@ -26,12 +26,15 @@ const LfoPanel = () => {
   );
 };
 
+const MasterLevelHook = createStoreHook(Param.Gain, setParamMasterLevel, [0, 1]);
+
 const MasterPanel = () => {
+  // todo: continue master level dial
   return (
     <Group>
       <HeaderText x={814} y={97} width={48} centered>MASTER</HeaderText>
 
-      <Dial x={810} y={123} h={65} hideBackground noInactive>Level</Dial>
+      <ConnectLogDial x={810} y={123} h={65} hook={MasterLevelHook}>Level</ConnectLogDial>
     </Group>
   );
 };

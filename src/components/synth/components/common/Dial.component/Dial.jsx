@@ -3,7 +3,6 @@ import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { Group, Rect } from 'react-konva';
 import { clampNumber } from '../../../../../common';
-import { ConnectHook } from '../../common-core';
 import { DialMarkerImage, BackgroundImage } from './Dial.assets';
 import { DialBackground } from './DialBackground';
 
@@ -67,8 +66,6 @@ export const Dial = ({ text: propText, children, w, h, value: propValue, valueCh
 
     typeof onValidateValue === 'function'
       && onValidateValue(value);
-    // eslint-disable-next-line no-console
-    console.warn('fired mouse up evt');
   };
 
   const img_w = BackgroundImage.imgWidthPx;
@@ -110,62 +107,6 @@ Dial.defaultProps = {
   mouseDown: false,
   w: 57,
   h: 68,
-};
-export const ConnectLogDial = ({ hook, ...props }) => ConnectHook(hook)(({ value, valueChanged }) => {
-  const range = (hook && hook[2]) || [0, 1];
-  const [min, max] = range.map(bound => Math.log(bound));
-
-  const scaleFromUnit = value => (max - min) * value + min;
-  const scaleToUnit = value => (value - min) / (max - min);
-
-  const logValue = Math.log(value);
-  const _value = (hook && (value || value !== 0) && scaleToUnit(logValue)) || 0;
-  const _valueChanged = value => valueChanged(Math.exp(scaleFromUnit(value)));
-
-  return <Dial {...props} value={_value} valueChanged={_valueChanged} />;
-});
-
-export const ConnectSnappyDial = ({ hook, segmentCount, ...props }) => ConnectHook(hook)(({ value, valueChanged }) => {
-  const [_value, _setValue] = useState(value);
-  useEffect(() => _setValue(value), [value]);
-  const valueChangedHook = nextValue => {
-    const snappedValue = Math.round(segmentCount * nextValue) / segmentCount;
-    valueChanged(snappedValue);
-  };
-  const validateValue = nextValue => {
-    const snapValue = Math.round(segmentCount * nextValue) / segmentCount;
-    const outsideThreshold = Math.abs(snapValue - _value) > 0.05;
-    _setValue(outsideThreshold ? snapValue : _value);
-  };
-  return <Dial {...props} value={_value} valueChanged={valueChangedHook} onValidateValue={validateValue} />;
-});
-ConnectSnappyDial.propTypes = {
-  hook: PropTypes.array,
-  segmentCount: PropTypes.number,
-};
-
-export const ReduxDial = ({ store, action, ...others }) => {
-  const handleValueChanged = (value) => store.dispatch(action(value));
-  return <Dial {...others} valueChanged={handleValueChanged} />;
-};
-ReduxDial.propTypes = {
-  store: PropTypes.object,
-  action: PropTypes.func,
-};
-
-export const ConnectDial = ({ hook, ...props }) => ConnectHook(hook)(({ value, valueChanged }) => {
-  const [min, max] = (hook && hook[2]) || [0, 1];
-
-  const scaleFromUnit = value => (max - min) * value + min;
-  const scaleToUnit = value => (value - min) / (max - min);
-
-  const _value = (hook && (value || value !== 0) && scaleToUnit(value)) || 0;
-  const _valueChanged = value => valueChanged(scaleFromUnit(value));
-
-  return <Dial {...props} value={_value} valueChanged={_valueChanged} />;
-});
-ConnectDial.propTypes = {
-  hook: PropTypes.array,
 };
 
 export default Dial;

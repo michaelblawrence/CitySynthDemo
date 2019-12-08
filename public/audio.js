@@ -131,7 +131,7 @@ function loadPreset(data) {
     console.log(`synth.load_preset(line = ${data});`);
     const result = synth.load_preset(data);
     if (result) {
-      console.error(result);
+      // console.error(result);
     }
   }
 }
@@ -145,7 +145,6 @@ function setParam(data) {
    */
   const synth = globalThis.synth;
   if (synth && typeof paramIden !== 'undefined' && typeof value === 'number') {
-    // console.log(`synth.set_state(paramIden = ${paramIden}, value = ${value});`);
     synth.set_state(paramIden, value);
   }
 }
@@ -194,7 +193,7 @@ function dumpAllParam(data, port) {
       (dict, kvp) => ({ ...dict, [kvp.param]: kvp.value }),
       {}
     );
-    console.table(values);
+    // console.table(values);
     port.postMessage({ type: 'DUMP_PARAMS_CALLBACK', dump });
     return dump;
   }
@@ -488,28 +487,29 @@ const Param = Object.freeze({
   Decay: 3,
   DelayWet: 4,
   Gain: 5,
-  Harmonic2Gain: 6,
-  HarmonicsControl: 7,
-  HarmonicFix: 8,
-  HarmonicFunction: 9,
-  HarmonicPhase: 10,
-  HarmonicV1: 11,
-  HPFCutoff: 12,
-  LPF: 13,
-  LPFattack: 14,
-  LPFceiling: 15,
-  LPFenvelope: 16,
-  LPFfloor: 17,
-  LPFmodrate: 18,
-  LPFrelease: 19,
-  LPFwidth: 20,
-  Pitchmod: 21,
-  PitchmodWidth: 22,
-  Release: 23,
-  ReverbWet: 24,
-  SubOscGain: 25,
-  Sustain: 26,
-  WFunction: 27
+  GeneralAtten: 6,
+  Harmonic2Gain: 7,
+  HarmonicsControl: 8,
+  HarmonicFix: 9,
+  HarmonicFunction: 10,
+  HarmonicPhase: 11,
+  HarmonicV1: 12,
+  HPFCutoff: 13,
+  LPF: 14,
+  LPFattack: 15,
+  LPFceiling: 16,
+  LPFenvelope: 17,
+  LPFfloor: 18,
+  LPFmodrate: 19,
+  LPFrelease: 20,
+  LPFwidth: 21,
+  Pitchmod: 22,
+  PitchmodWidth: 23,
+  Release: 24,
+  ReverbWet: 25,
+  SubOscGain: 26,
+  Sustain: 27,
+  WFunction: 28
 });
 
 function freeCitySynth(ptr) {

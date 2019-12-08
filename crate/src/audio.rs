@@ -24,7 +24,7 @@ impl CitySynth {
 
         let sample_rate = sample_rate.unwrap_or(DEFAULT_SAMPLE_RATE);
         let (mut synth, events_handler) = PolySynth::new(sample_rate, voices_count, bucket.clone());
-        synth.dverb_active = false;
+        synth.dverb_active = true;
 
         Self {
             poly: synth,
@@ -93,6 +93,7 @@ pub enum Param {
     Decay,
     DelayWet,
     Gain,
+    GeneralAtten,
     Harmonic2Gain,
     HarmonicsControl,
     HarmonicFix,
@@ -126,6 +127,7 @@ impl Param {
             Param::Decay              => Some(R::Decay),
             Param::DelayWet           => Some(R::DelayWet),
             Param::Gain               => Some(R::Gain),
+            Param::GeneralAtten       => Some(R::GeneralAtten),
             Param::Harmonic2Gain      => Some(R::Harmonic2Gain),
             Param::HarmonicsControl   => Some(R::HarmonicsControl),
             Param::HarmonicFix        => Some(R::HarmonicFix),

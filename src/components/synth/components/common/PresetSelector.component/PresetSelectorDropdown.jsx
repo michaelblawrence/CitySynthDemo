@@ -48,11 +48,10 @@ export const PresetSelectorDropdown = ({ visible, onChangePreset, handleEvent, p
     .slice(scrollIdx.min, scrollIdx.max)
     .map((item, idx, { length }) => {
       const handlePresetClick = () => {
-        onChangePreset({
+        onChangePreset && onChangePreset({
           idx: scrolledRows + idx,
           presetName: presetItems[scrolledRows + idx]
         });
-        handleEvent(PresetEventType.RELOAD_PRESET);
       };
 
       return [

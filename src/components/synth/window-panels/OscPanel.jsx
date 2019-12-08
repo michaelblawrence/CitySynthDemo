@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Group } from 'react-konva';
 
-import { HeaderText, PanelDivider, WavePreviewBox, ReduxDial, ConnectDial, ToggleIcon } from '../components';
+import { HeaderText, PanelDivider, WavePreviewBox, ReduxDial, ConnectDial, ToggleIcon, ConnectSnappyDial } from '../components';
 import { setParamDelayLength, setParamDelayWetAmt, setParamOscPhase, setParamOscWaveFunction, setParamOscGain, setParamReverbWetAmt } from '../../../redux/actions/OscActions';
 import store from '../../../store';
 import { createStoreHook } from '../../../redux/actions/helper';
@@ -9,7 +9,7 @@ import { Param } from '../../../redux/types';
 
 const OscPhaseHook = createStoreHook(Param.HarmonicPhase, setParamOscPhase, [0, 1]);
 const OscWaveSelectorHook = createStoreHook(Param.WFunction, setParamOscWaveFunction, [0, 5]);
-const OscGainHook = createStoreHook(Param.Gain, setParamOscGain, [0, 1]);
+const OscGainHook = createStoreHook(Param.GeneralAtten, setParamOscGain, [-48, 6]);
 
 const OscPanel = () => {
   return (
@@ -17,7 +17,7 @@ const OscPanel = () => {
       <HeaderText x={131} y={97} width={38} centered>OSC 1</HeaderText>
       <WavePreviewBox x={131} y={120} />
 
-      <ConnectDial x={127} y={186} h={83} hook={OscWaveSelectorHook}>Wave Selector</ConnectDial>
+      <ConnectSnappyDial x={127} y={186} h={83} hook={OscWaveSelectorHook} segmentCount={5}>Wave Selector</ConnectSnappyDial>
       <ConnectDial x={193} y={200} h={69} hook={OscPhaseHook}>Phase</ConnectDial>
       <ConnectDial x={259} y={200} h={69} hook={OscGainHook}>Gain</ConnectDial>
     </Group>
