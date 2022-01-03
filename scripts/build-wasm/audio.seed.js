@@ -65,6 +65,12 @@ async function handleMessage(msg) {
     case 'MODULE':
       await initModule(data);
       return;
+    case 'FROM_MODULE_TYPE':
+      await initModule(data);
+      return;
+    case 'USE_MODULE_INSTANCE':
+      await useModuleInstance(data);
+      return;
     case 'KEY_DOWN':
       handleKeyDown(data);
       return;
@@ -209,6 +215,14 @@ async function initModule(module) {
       }
     }
   });
+  useModuleInstance(instance);
+}
+
+async function useModuleInstance(instance) {
+  if (globalThis.wasm) {
+    console.warn('useModuleInstance was called after module was instantiated');
+    return;
+  }
   globalThis.wasm = instance.exports;
   globalThis.synth = CitySynth.new(2);
   globalThis.synth.set_delay_reverb_active(false);

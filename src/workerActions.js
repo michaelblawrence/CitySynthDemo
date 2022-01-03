@@ -32,6 +32,8 @@ const presetPromptKey = { key: '.', keyCode: 190 };
 
 const WorkerActions = {
   MODULE: 'MODULE',
+  FROM_MODULE_TYPE: 'FROM_MODULE_TYPE',
+  USE_MODULE_INSTANCE: 'USE_MODULE_INSTANCE',
   DUMP_PARAMS: 'DUMP_PARAMS',
   REFRESH_EG: 'REFRESH_EG',
   SET_PRESET: 'SET_PRESET',
@@ -42,7 +44,8 @@ const WorkerActions = {
 };
 
 const WorkerActionFactory = {
-  sendModule: (module) => ({ type: WorkerActions.MODULE, data: module }),
+  sendModule: (module) => ({ type: WorkerActions.FROM_MODULE_TYPE, data: module }),
+  sendModuleInstance: (intance) => ({ type: WorkerActions.USE_MODULE_INSTANCE, data: intance }),
   sendKeyDown: (keyEvent) => ({ type: WorkerActions.KEY_DOWN, data: keyEvent }),
   sendKeyUp: (keyCode) => ({ type: WorkerActions.KEY_UP, data: keyCode }),
   getState: (paramIden) => ({ type: WorkerActions.GET_PARAM, data: paramIden }),
@@ -66,6 +69,39 @@ async function getModule() {
   return await WebAssembly.compile(bytes);
 }
 
+/**
+ * @param {WebAssembly.Module} module
+ */
+async function initModule(module) {
+  const instance = await WebAssembly.instantiate(module, {
+    ['./citysynth_wasm']: {
+      ['__wbindgen_throw']: (i1, i2) => {
+        try {
+          __wbindgen_throw(i1, i2);
+        }
+        catch (ex) {
+          console.error('throw wasm error' + ex ? `: ${JSON.stringify(ex)}` : '');
+        }
+      }
+    }
+  });
+    /** @type {any} */
+  const wasm = instance.exports;
+  const getUint8Memory = () => {
+    return new Uint8Array(wasm.memory.buffer);
+  };
+  return instance;
+
+  function __wbindgen_throw(ptr, len) {
+    throw new Error(getStringFromWasm(ptr, len));
+  }
+
+  function getStringFromWasm(ptr, len) {
+    const cachedTextDecoder = new TextDecoder('utf-8');
+    return cachedTextDecoder.decode(getUint8Memory().subarray(ptr, ptr + len));
+  }
+}
+
 export async function getWasmModule() {
   if (initState.synthNode) {
     return;
@@ -75,8 +111,9 @@ export async function getWasmModule() {
   const actx = new AudioContext();
   await actx.audioWorklet.addModule('audio.js');
   const module = await getModule();
+  const instance = await initModule(module);
   const synthNode = new AudioWorkletNode(actx, 'city-rust');
-  postWorkerAction(synthNode, WorkerActionFactory.sendModule(module));
+  postWorkerAction(synthNode, WorkerActionFactory.sendModuleInstance(instance));
   synthNode.connect(actx.destination);
   initState.synthNode = synthNode;
   const port$ = new Observable((subscriber) => {
