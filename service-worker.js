@@ -14,7 +14,7 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/3.6.3/workbox-sw.js");
 
 importScripts(
-  "/CitySynth/precache-manifest.3143e2d2bfab0a0d5bfcf2e32e6c990a.js"
+  "/CitySynthDemo/precache-manifest.38d2d4a6e76f14b1634193f84ba667ff.js"
 );
 
 workbox.clientsClaim();
@@ -28,7 +28,7 @@ self.__precacheManifest = [].concat(self.__precacheManifest || []);
 workbox.precaching.suppressWarnings();
 workbox.precaching.precacheAndRoute(self.__precacheManifest, {});
 
-workbox.routing.registerNavigationRoute("/CitySynth/index.html", {
+workbox.routing.registerNavigationRoute("/CitySynthDemo/index.html", {
   
   blacklist: [/^\/_/,/\/[^\/]+\.[^\/]+$/],
 });
