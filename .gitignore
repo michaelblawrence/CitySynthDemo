@@ -15,5 +15,6 @@ node_modules
 .DS_Store
 
 .log
-public/res/csharp/
+public/res/wasm-synth/
+public/res/audio
 crate/target/
