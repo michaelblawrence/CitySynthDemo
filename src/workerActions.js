@@ -33,6 +33,7 @@ const presetPromptKey = { key: '.', keyCode: 190 };
 const WorkerActions = {
   MODULE: 'MODULE',
   FROM_MODULE_TYPE: 'FROM_MODULE_TYPE',
+  FROM_MODULE_BYTE_BUFFER: 'FROM_MODULE_BYTE_BUFFER',
   USE_MODULE_INSTANCE: 'USE_MODULE_INSTANCE',
   DUMP_PARAMS: 'DUMP_PARAMS',
   REFRESH_EG: 'REFRESH_EG',
@@ -45,6 +46,7 @@ const WorkerActions = {
 
 const WorkerActionFactory = {
   sendModule: (module) => ({ type: WorkerActions.FROM_MODULE_TYPE, data: module }),
+  sendModuleAsBytes: (intance) => ({ type: WorkerActions.FROM_MODULE_BYTE_BUFFER, data: intance }),
   sendModuleInstance: (intance) => ({ type: WorkerActions.USE_MODULE_INSTANCE, data: intance }),
   sendKeyDown: (keyEvent) => ({ type: WorkerActions.KEY_DOWN, data: keyEvent }),
   sendKeyUp: (keyCode) => ({ type: WorkerActions.KEY_UP, data: keyCode }),
@@ -63,43 +65,9 @@ function postWorkerAction(workletNode, workerAction) {
   workletNode.port.postMessage(workerAction);
 }
 
-async function getModule() {
+async function getModuleBytes() {
   const response = await fetch('wasm-synth/citysynth_wasm_bg.wasm');
-  const bytes = await response.arrayBuffer();
-  return await WebAssembly.compile(bytes);
-}
-
-/**
- * @param {WebAssembly.Module} module
- */
-async function initModule(module) {
-  const instance = await WebAssembly.instantiate(module, {
-    ['./citysynth_wasm']: {
-      ['__wbindgen_throw']: (i1, i2) => {
-        try {
-          __wbindgen_throw(i1, i2);
-        }
-        catch (ex) {
-          console.error('throw wasm error' + ex ? `: ${JSON.stringify(ex)}` : '');
-        }
-      }
-    }
-  });
-    /** @type {any} */
-  const wasm = instance.exports;
-  const getUint8Memory = () => {
-    return new Uint8Array(wasm.memory.buffer);
-  };
-  return instance;
-
-  function __wbindgen_throw(ptr, len) {
-    throw new Error(getStringFromWasm(ptr, len));
-  }
-
-  function getStringFromWasm(ptr, len) {
-    const cachedTextDecoder = new TextDecoder('utf-8');
-    return cachedTextDecoder.decode(getUint8Memory().subarray(ptr, ptr + len));
-  }
+  return await response.arrayBuffer();
 }
 
 export async function getWasmModule() {
@@ -110,10 +78,8 @@ export async function getWasmModule() {
   const AudioContext = window.AudioContext || window.webkitAudioContext;
   const actx = new AudioContext();
   await actx.audioWorklet.addModule('audio.js');
-  const module = await getModule();
-  const instance = await initModule(module);
+  const moduleBytes = await getModuleBytes();
   const synthNode = new AudioWorkletNode(actx, 'city-rust');
-  postWorkerAction(synthNode, WorkerActionFactory.sendModuleInstance(instance));
   synthNode.connect(actx.destination);
   initState.synthNode = synthNode;
   const port$ = new Observable((subscriber) => {
@@ -130,6 +96,15 @@ export async function getWasmModule() {
       synthNode.port.onmessageerror = null;
     };
   }).pipe(shareReplay());
+  const moduleReadyPromise = new Promise(ok => {
+    port$.pipe(
+      filter(next => next.error === null),
+      filter(({ message }) => message.data.type === 'MODULE_READY'),
+      take(1)
+    ).subscribe(() => ok());
+  });
+  postWorkerAction(synthNode, WorkerActionFactory.sendModuleAsBytes(moduleBytes));
+  await moduleReadyPromise;
   setupInitState(port$);
   await syncParamsState();
 }
@@ -165,11 +140,11 @@ async function getAllParamValues() {
         dumpParamsSubject.pipe(
           take(1)
         ).subscribe(({ data }) => {
-          if (typeof data !== 'undefined') {
-            resolve(data.dump);
-          }
+          resolve(data.dump);
         });
         postWorkerAction(synthNode, WorkerActionFactory.dumpState());
+      } else {
+        reject('no synthNode found');
       }
     }
     catch (ex) {
