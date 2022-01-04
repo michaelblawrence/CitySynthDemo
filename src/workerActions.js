@@ -100,13 +100,7 @@ export async function getWasmModule() {
       synthNode.port.onmessageerror = null;
     };
   }).pipe(shareReplay());
-  const moduleReadyPromise = new Promise(ok => {
-    port$.pipe(
-      filter(next => next.error === null),
-      filter(({ message }) => message.data.type === 'MODULE_READY'),
-      take(1)
-    ).subscribe(() => ok());
-  });
+  const moduleReadyPromise = createWasmReadyPromise(port$);
   postWorkerAction(synthNode, WorkerActionFactory.sendModuleAsBytes(moduleBytes));
   await moduleReadyPromise;
   setupInitState(port$);
@@ -135,6 +129,16 @@ function setupInitState(port$) {
     filter(evt => evt.data.type === 'DUMP_PARAMS_CALLBACK'),
     filter(evt => typeof evt.data.dump !== 'undefined')
   ).subscribe(samples => dumpParamsSubject.next(samples));
+}
+
+function createWasmReadyPromise(port$) {
+  return new Promise(ok => {
+    port$.pipe(
+      filter(next => next.error === null),
+      filter(({ message }) => message.data.type === 'MODULE_READY'),
+      take(1)
+    ).subscribe(() => ok());
+  });
 }
 
 async function getAllParamValues() {
