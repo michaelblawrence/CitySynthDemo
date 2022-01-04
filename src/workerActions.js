@@ -70,6 +70,10 @@ async function getModuleBytes() {
   return await response.arrayBuffer();
 }
 
+
+const synthReadySubject = new Subject();
+export const synthReady$ = synthReadySubject.asObservable();
+
 export async function getWasmModule() {
   if (initState.synthNode) {
     return;
@@ -107,6 +111,7 @@ export async function getWasmModule() {
   await moduleReadyPromise;
   setupInitState(port$);
   await syncParamsState();
+  synthReadySubject.next();
 }
 
 const waveformSubject = new Subject();

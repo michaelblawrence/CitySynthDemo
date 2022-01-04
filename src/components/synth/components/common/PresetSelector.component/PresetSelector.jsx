@@ -2,11 +2,11 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { Group } from 'react-konva';
-import { postPresetLine } from '../../../../../workerActions';
+import { postPresetLine, synthReady$ } from '../../../../../workerActions';
 import { PresetEventType } from './PresetSelector.assets';
 import { PresetSelectorBar } from './PresetSelectorBar';
 import { PresetSelectorDropdown } from './PresetSelectorDropdown';
-
+import { take } from 'rxjs/operators';
 
 const tempPresetsPromise = fetch('res/csharp/factorypresets.sdp');
 
@@ -40,11 +40,12 @@ export const PresetSelector = ({ x, y }) => {
   const toggleDropDown = () => setDropVisible(!isDropVisible);
 
   const [presetArray, updatePresetArray] = useState([]);
+  const [synthReady, updateSynthReady] = useState(false);
   const initialPresetIdx = 0;
 
   const [selectedPreset, setPreset] = useState({ presetName: 'Initial', idx: 0 });
   const handlePresetNameAndPush = async ({ presetName, idx }) =>
-    await new Promise(ok => setPreset(() => { ok(); return { presetName, idx }}));
+    await new Promise(ok => setPreset(() => { ok(); return { presetName, idx }; }));
 
   useEffect(() => {
     tempPresetsPromise
@@ -55,7 +56,18 @@ export const PresetSelector = ({ x, y }) => {
         updatePresetArray(presetArray);
         return handlePresetNameAndPush({ presetName: initialPresetName, idx: initialPresetIdx });
       });
+    synthReady$.pipe(
+      take(1)
+    ).subscribe(() => {
+      updateSynthReady(true);
+    });
   }, []);
+  useEffect(() => {
+    if (synthReady === true && presetArray.length > 0) {
+      handleEvent(PresetEventType.RELOAD_PRESET);
+      updateSynthReady(null);
+    }
+  }, [presetArray, synthReady]);
 
   const handleNewPresetSelection = async ({ presetName, idx }) => {
     await handlePresetNameAndPush({presetName, idx});
@@ -64,7 +76,7 @@ export const PresetSelector = ({ x, y }) => {
 
   const shiftPreset = (shiftAmount) => {
     const presetCount = presetArray.length;
-    const idx = (selectedPreset.idx + shiftAmount + presetCount) % presetCount;
+    const idx = ((selectedPreset.idx + shiftAmount + presetCount) % presetCount) || 0;
     return { presetName: parsePresetName(presetArray, idx), idx };
   };
 
@@ -85,8 +97,8 @@ export const PresetSelector = ({ x, y }) => {
         await postPresetLine(presetArray[newPreset.idx]);
         break;
       case PresetEventType.RELOAD_PRESET:
-        // newPreset = shiftPreset(0);
-        // setPreset(newPreset);
+        newPreset = shiftPreset(0);
+        setPreset(newPreset);
         await postPresetLine(presetArray[newPreset.idx]);
         break;
       default:
