@@ -35,6 +35,10 @@ WavePreviewBox.defaultProps = {
   gain: 5
 };
 
+function notNaN(number) {
+  return number || 0;
+}
+
 const WavePreviewBoxLine = ({ gain }) => {
   const emptyArray = nItems => new Array(nItems).fill(0);
   const [points, setPoints] = useState(emptyArray(128 * 2));
@@ -46,8 +50,8 @@ const WavePreviewBoxLine = ({ gain }) => {
       const mid = WaveBoxBackground.imgHeightPx / 2;
       samples.forEach((sample, idx) => {
         const clipped = clampNumber(sample * gain, 1, -1);
-        pts[idx * 2] = (WaveBoxBackground.imgWidthPx - (2)) * idx / maxIdx + 1;
-        pts[idx * 2 + 1] = mid * (-clipped + 1);
+        pts[idx * 2] = notNaN((WaveBoxBackground.imgWidthPx - (2)) * idx / maxIdx + 1);
+        pts[idx * 2 + 1] = notNaN(mid * (-clipped + 1));
       });
       setPoints(pts);
     });
