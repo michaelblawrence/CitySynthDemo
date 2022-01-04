@@ -72,13 +72,16 @@ async function handleMessage(msg) {
 
   switch (type) {
     case 'MODULE':
-      await initModule(data);
+      await initModule(data, this.port);
       return;
     case 'FROM_MODULE_TYPE':
-      await initModule(data);
+      await initModule(data, this.port);
+      return;
+    case 'FROM_MODULE_BYTE_BUFFER':
+      await initModuleFromBytes(data, this.port);
       return;
     case 'USE_MODULE_INSTANCE':
-      await useModuleInstance(data);
+      await useModuleInstance(data, this.port);
       return;
     case 'KEY_DOWN':
       handleKeyDown(data);
@@ -216,7 +219,12 @@ function triggerRefresh() {
   }
 }
 
-async function initModule(module) {
+async function initModuleFromBytes(bytes, port) {
+  const module = await WebAssembly.compile(bytes);
+  await initModule(module, port);
+}
+
+async function initModule(module, port) {
   if (globalThis.wasm) {
     console.warn('initModule was called after module was instantiated');
     return;
@@ -234,17 +242,17 @@ async function initModule(module) {
       }
     }
   });
-  useModuleInstance(instance);
+  useModuleInstance(instance, port);
 }
 
-async function useModuleInstance(instance) {
+async function useModuleInstance(instance, port) {
   if (globalThis.wasm) {
     console.warn('useModuleInstance was called after module was instantiated');
     return;
   }
   globalThis.wasm = instance.exports;
   globalThis.synth = CitySynth.new(2);
-  globalThis.synth.set_delay_reverb_active(false);
+  port.postMessage({ type: 'MODULE_READY' });
 }
 
 // --------------------------------------- polyfills ------------------------------------
