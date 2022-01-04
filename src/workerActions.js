@@ -32,6 +32,9 @@ const presetPromptKey = { key: '.', keyCode: 190 };
 
 const WorkerActions = {
   MODULE: 'MODULE',
+  FROM_MODULE_TYPE: 'FROM_MODULE_TYPE',
+  FROM_MODULE_BYTE_BUFFER: 'FROM_MODULE_BYTE_BUFFER',
+  USE_MODULE_INSTANCE: 'USE_MODULE_INSTANCE',
   DUMP_PARAMS: 'DUMP_PARAMS',
   REFRESH_EG: 'REFRESH_EG',
   SET_PRESET: 'SET_PRESET',
@@ -42,7 +45,9 @@ const WorkerActions = {
 };
 
 const WorkerActionFactory = {
-  sendModule: (module) => ({ type: WorkerActions.MODULE, data: module }),
+  sendModule: (module) => ({ type: WorkerActions.FROM_MODULE_TYPE, data: module }),
+  sendModuleAsBytes: (intance) => ({ type: WorkerActions.FROM_MODULE_BYTE_BUFFER, data: intance }),
+  sendModuleInstance: (intance) => ({ type: WorkerActions.USE_MODULE_INSTANCE, data: intance }),
   sendKeyDown: (keyEvent) => ({ type: WorkerActions.KEY_DOWN, data: keyEvent }),
   sendKeyUp: (keyCode) => ({ type: WorkerActions.KEY_UP, data: keyCode }),
   getState: (paramIden) => ({ type: WorkerActions.GET_PARAM, data: paramIden }),
@@ -60,11 +65,14 @@ function postWorkerAction(workletNode, workerAction) {
   workletNode.port.postMessage(workerAction);
 }
 
-async function getModule() {
+async function getModuleBytes() {
   const response = await fetch('wasm-synth/citysynth_wasm_bg.wasm');
-  const bytes = await response.arrayBuffer();
-  return await WebAssembly.compile(bytes);
+  return await response.arrayBuffer();
 }
+
+
+const synthReadySubject = new Subject();
+export const synthReady$ = synthReadySubject.asObservable();
 
 export async function getWasmModule() {
   if (initState.synthNode) {
@@ -74,9 +82,8 @@ export async function getWasmModule() {
   const AudioContext = window.AudioContext || window.webkitAudioContext;
   const actx = new AudioContext();
   await actx.audioWorklet.addModule('audio.js');
-  const module = await getModule();
+  const moduleBytes = await getModuleBytes();
   const synthNode = new AudioWorkletNode(actx, 'city-rust');
-  postWorkerAction(synthNode, WorkerActionFactory.sendModule(module));
   synthNode.connect(actx.destination);
   initState.synthNode = synthNode;
   const port$ = new Observable((subscriber) => {
@@ -93,8 +100,12 @@ export async function getWasmModule() {
       synthNode.port.onmessageerror = null;
     };
   }).pipe(shareReplay());
+  const moduleReadyPromise = createWasmReadyPromise(port$);
+  postWorkerAction(synthNode, WorkerActionFactory.sendModuleAsBytes(moduleBytes));
+  await moduleReadyPromise;
   setupInitState(port$);
   await syncParamsState();
+  synthReadySubject.next();
 }
 
 const waveformSubject = new Subject();
@@ -120,6 +131,16 @@ function setupInitState(port$) {
   ).subscribe(samples => dumpParamsSubject.next(samples));
 }
 
+function createWasmReadyPromise(port$) {
+  return new Promise(ok => {
+    port$.pipe(
+      filter(next => next.error === null),
+      filter(({ message }) => message.data.type === 'MODULE_READY'),
+      take(1)
+    ).subscribe(() => ok());
+  });
+}
+
 async function getAllParamValues() {
   return await new Promise((resolve, reject) => {
     try {
@@ -128,11 +149,11 @@ async function getAllParamValues() {
         dumpParamsSubject.pipe(
           take(1)
         ).subscribe(({ data }) => {
-          if (typeof data !== 'undefined') {
-            resolve(data.dump);
-          }
+          resolve(data.dump);
         });
         postWorkerAction(synthNode, WorkerActionFactory.dumpState());
+      } else {
+        reject('no synthNode found');
       }
     }
     catch (ex) {
