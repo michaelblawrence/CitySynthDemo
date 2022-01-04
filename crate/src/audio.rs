@@ -24,6 +24,9 @@ impl CitySynth {
 
         let sample_rate = sample_rate.unwrap_or(DEFAULT_SAMPLE_RATE);
         let (mut synth, events_handler) = PolySynth::new(sample_rate, voices_count, bucket.clone());
+        
+        synth.state_mut().set(R::DelayWet, 0.0);
+        synth.state_mut().set(R::ReverbWet, 0.0);
 
         Self {
             poly: synth,
