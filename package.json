@@ -1,6 +1,6 @@
 {
-  "name": "niflum-io",
-  "version": "0.1.0",
+  "name": "city-synth-online",
+  "version": "0.2.0",
   "private": true,
   "dependencies": {
     "konva": "^4.0.5",

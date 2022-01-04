@@ -65,11 +65,10 @@ jQuery(document).ready(function ($) {
   /* equal to the browser height.
   ------------------------------------------------------ */
 
+  $('body').css({ 'min-width': 'max-content' });
   $('header').css({ 'height': $(window).height() });
   $(window).on('resize', function () {
-
     $('header').css({ 'height': $(window).height() });
-    $('body').css({ 'width': $(window).width() });
   });
 
 
