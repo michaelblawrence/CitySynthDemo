@@ -53,8 +53,10 @@ export class KeyboardElement {
 
       const mouseDownHandler = ev => this.handleMouse(ev, true, i);
       key.addEventListener('mousedown', mouseDownHandler);
+      key.addEventListener('touchstart', mouseDownHandler);
       const mouseUpHandler = ev => this.handleMouse(ev, false, i);
       key.addEventListener('mouseup', mouseUpHandler);
+      key.addEventListener('touchend', mouseUpHandler);
 
       const fill = document.createElement('div');
       fill.classList.add('fill');
