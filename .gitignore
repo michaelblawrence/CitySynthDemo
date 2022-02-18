@@ -14,7 +14,7 @@ node_modules
 # misc
 .DS_Store
 
-.log
+*.log
 public/wasm-synth/
 public/audio.js
 crate/target/
