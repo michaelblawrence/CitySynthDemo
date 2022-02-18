@@ -1,6 +1,6 @@
 {
-  "name": "city-synth-online",
-  "version": "0.2.0",
+  "name": "niflum-io",
+  "version": "0.1.0",
   "private": true,
   "dependencies": {
     "konva": "^4.0.5",
@@ -26,10 +26,10 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "init-scripts": "yarn --cwd .\\scripts\\build-wasm init-rs",
     "build": "react-scripts build",
     "build-wasm": "yarn --cwd .\\scripts\\build-wasm build",
     "build-wasm-offline": "yarn --cwd .\\scripts\\build-wasm --offline build-offline",
+    "init-scripts": "yarn --cwd .\\scripts\\build-wasm init-rs",
     "predeploy": "yarn build",
     "deploy": "gh-pages -d build",
     "test": "react-scripts test",
@@ -38,7 +38,7 @@
   "eslintConfig": {
     "extends": "react-app"
   },
-  "homepage": "http://michaelblawrence.github.io/CitySynthDemo",
+  "homepage": "http://michaelblawrence.github.io/CitySynth",
   "browserslist": [
     ">0.2%",
     "not dead",
