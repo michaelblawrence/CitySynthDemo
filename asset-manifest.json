@@ -1,13 +1,13 @@
 {
-  "main.css": "/CitySynth/static/css/main.8f8d57c2.chunk.css",
-  "main.js": "/CitySynth/static/js/main.30125fd5.chunk.js",
-  "main.js.map": "/CitySynth/static/js/main.30125fd5.chunk.js.map",
-  "static/js/1.becffcfd.chunk.js": "/CitySynth/static/js/1.becffcfd.chunk.js",
-  "static/js/1.becffcfd.chunk.js.map": "/CitySynth/static/js/1.becffcfd.chunk.js.map",
-  "runtime~main.js": "/CitySynth/static/js/runtime~main.559d4f28.js",
-  "runtime~main.js.map": "/CitySynth/static/js/runtime~main.559d4f28.js.map",
-  "static/css/main.8f8d57c2.chunk.css.map": "/CitySynth/static/css/main.8f8d57c2.chunk.css.map",
-  "index.html": "/CitySynth/index.html",
-  "precache-manifest.0a546081cafe09d189ec58349b1410be.js": "/CitySynth/precache-manifest.0a546081cafe09d189ec58349b1410be.js",
-  "service-worker.js": "/CitySynth/service-worker.js"
+  "main.css": "/CitySynthDemo/static/css/main.8f8d57c2.chunk.css",
+  "main.js": "/CitySynthDemo/static/js/main.d1bf9677.chunk.js",
+  "main.js.map": "/CitySynthDemo/static/js/main.d1bf9677.chunk.js.map",
+  "static/js/1.becffcfd.chunk.js": "/CitySynthDemo/static/js/1.becffcfd.chunk.js",
+  "static/js/1.becffcfd.chunk.js.map": "/CitySynthDemo/static/js/1.becffcfd.chunk.js.map",
+  "runtime~main.js": "/CitySynthDemo/static/js/runtime~main.be5a8629.js",
+  "runtime~main.js.map": "/CitySynthDemo/static/js/runtime~main.be5a8629.js.map",
+  "static/css/main.8f8d57c2.chunk.css.map": "/CitySynthDemo/static/css/main.8f8d57c2.chunk.css.map",
+  "index.html": "/CitySynthDemo/index.html",
+  "precache-manifest.b795bedb6ee58bc7b8ebebda1bcda21f.js": "/CitySynthDemo/precache-manifest.b795bedb6ee58bc7b8ebebda1bcda21f.js",
+  "service-worker.js": "/CitySynthDemo/service-worker.js"
 }
